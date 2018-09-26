@@ -1,4 +1,4 @@
-package jota;
+package jota.connection;
 
 import jota.dto.request.*;
 import jota.dto.response.*;
@@ -12,7 +12,7 @@ import retrofit2.http.POST;
  *
  * @author davassi
  */
-public interface IotaAPIService {
+public interface IotaAPIHTTPService {
 
     String CONTENT_TYPE_HEADER = "Content-Type: application/json";
     String USER_AGENT_HEADER = "User-Agent: JOTA-API wrapper";

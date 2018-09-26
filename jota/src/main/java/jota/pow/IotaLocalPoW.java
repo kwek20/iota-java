@@ -1,4 +1,4 @@
-package jota;
+package jota.pow;
 
 /**
  * Interface for an implementation to perform local PoW.

@@ -1,9 +1,11 @@
 package jota;
 
+import jota.connection.IotaAPIHTTPService;
 import jota.dto.request.*;
 import jota.dto.response.*;
 import jota.error.ArgumentException;
 import jota.model.Transaction;
+import jota.pow.IotaLocalPoW;
 import jota.utils.Checksum;
 import jota.utils.InputValidator;
 import okhttp3.Interceptor;
@@ -39,7 +41,7 @@ public class IotaAPICore {
 
     private static final Logger log = LoggerFactory.getLogger(IotaAPICore.class);
 
-    private IotaAPIService service;
+    private IotaAPIHTTPService service;
     private String protocol, host, port;
     private IotaLocalPoW localPoW;
 
@@ -125,7 +127,7 @@ public class IotaAPICore {
                 .client(client)
                 .build();
 
-        service = retrofit.create(IotaAPIService.class);
+        service = retrofit.create(IotaAPIHTTPService.class);
 
         log.debug("Jota-API Java proxy pointing to node url: '{}'", nodeUrl);
     }
