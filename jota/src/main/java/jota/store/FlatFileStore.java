@@ -100,4 +100,9 @@ public class FlatFileStore implements Store {
         }
         return prop;
     }
+    
+    @Override
+    public boolean canWrite() {
+        return true;
+    }
 }

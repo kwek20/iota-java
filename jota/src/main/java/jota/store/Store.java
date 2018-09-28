@@ -13,4 +13,6 @@ public interface Store {
     Serializable get(String key, Serializable def);
     
     Serializable set(String key, Serializable value);
+    
+    boolean canWrite();
 }

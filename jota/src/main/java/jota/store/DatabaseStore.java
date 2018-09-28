@@ -34,4 +34,9 @@ public class DatabaseStore implements Store {
         return null;
     }
 
+    @Override
+    public boolean canWrite() {
+        return true;
+    }
+
 }

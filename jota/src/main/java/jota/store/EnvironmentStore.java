@@ -6,8 +6,7 @@ public class EnvironmentStore implements Store {
 
     @Override
     public void load() throws Exception {
-        // TODO Auto-generated method stub
-
+        //Do nothing :D
     }
 
     @Override
@@ -17,14 +16,13 @@ public class EnvironmentStore implements Store {
 
     @Override
     public Serializable get(String key) {
-        // TODO Auto-generated method stub
-        return null;
+        return System.getenv(key);
     }
 
     @Override
     public Serializable get(String key, Serializable def) {
-        // TODO Auto-generated method stub
-        return null;
+        String value = System.getenv(key);;
+        return value != null ? value : def;
     }
 
     @Override
@@ -33,4 +31,8 @@ public class EnvironmentStore implements Store {
         //throw new NotAllowedException("Environment store does not allow setting values");
     }
 
+    @Override
+    public boolean canWrite() {
+        return false;
+    }
 }

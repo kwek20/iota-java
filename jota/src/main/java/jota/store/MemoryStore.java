@@ -41,6 +41,9 @@ public class MemoryStore implements Store {
         return store.put(key, value);
     }
 
-    
+    @Override
+    public boolean canWrite() {
+        return true;
+    }
 
 }

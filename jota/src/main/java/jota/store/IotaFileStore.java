@@ -1,16 +1,11 @@
 package jota.store;
 
-import java.util.List;
 import java.io.Serializable;
 
-import jota.model.Bundle;
+public class IotaFileStore extends IotaClientStore {
 
-public class IOTADefaultStore implements IotaClientStorage {
-    
-    private Store store;
-
-    public IOTADefaultStore(String location) {
-        this.store = new FlatFileStore(location);
+    public IotaFileStore(String location) {
+        super(new FlatFileStore(location));
     }
 
     @Override
@@ -29,11 +24,4 @@ public class IOTADefaultStore implements IotaClientStorage {
         store.set(seed, cur+1);
         return cur;
     }
-
-    @Override
-    public List<Bundle> getPendingBundles() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }
