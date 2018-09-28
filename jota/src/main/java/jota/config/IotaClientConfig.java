@@ -35,4 +35,18 @@ public abstract class IotaClientConfig implements IotaConfig {
         Serializable ret = store.get(key);
         return ret != null ? ret .toString() : null;
     }
+    
+    /**
+     * 
+     * @param key
+     * @return The parsed int value or <code>0</code>
+     */
+    protected int intOrNull(String key) {
+        Serializable ret = store.get(key);
+        try {
+            return Integer.parseInt(ret.toString());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
 }

@@ -34,10 +34,10 @@ public class ConnectionFactory {
         try {
             switch (type) {
             case HTTP:
+                int port = Integer.parseInt(KEY_PORT);
                 return new HttpConnector(
                         configValues.get(KEY_PROTOCOL), 
-                        host, 
-                        configValues.get(KEY_PORT));
+                        host, port);
             }
         } catch (Exception e) {
             //Wrong parameters for a connection type

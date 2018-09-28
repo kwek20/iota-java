@@ -49,16 +49,26 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class HttpConnector implements Connection {
     private String protocol;
     private String host;
-    private String port;
+    private int port;
     
     private IotaAPIHTTPService service;
     
     private static final Logger log = LoggerFactory.getLogger(IotaAPICore.class);
 
-    public HttpConnector(String protocol, String host, String port) {
+    public HttpConnector(String protocol, String host, int port) {
         this.protocol = protocol;
         this.host = host;
         this.port = port;
+    }
+    
+    @Override
+    public int port() {
+        return port;
+    }
+    
+    @Override
+    public String url() {
+        return host;
     }
     
     public void start() {
@@ -126,97 +136,97 @@ public class HttpConnector implements Connection {
     }
 
     @Override
-    public GetNodeInfoResponse getNodeInfo(IotaCommandRequest request) throws Exception {
+    public GetNodeInfoResponse getNodeInfo(IotaCommandRequest request) throws ArgumentException {
         final Call<GetNodeInfoResponse> res = service.getNodeInfo(IotaCommandRequest.createNodeInfoRequest());
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public GetNeighborsResponse getNeighbors(IotaCommandRequest request) throws Exception {
+    public GetNeighborsResponse getNeighbors(IotaCommandRequest request) throws ArgumentException {
         final Call<GetNeighborsResponse> res = service.getNeighbors(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public AddNeighborsResponse addNeighbors(IotaNeighborsRequest request) throws Exception {
+    public AddNeighborsResponse addNeighbors(IotaNeighborsRequest request) throws ArgumentException {
         final Call<AddNeighborsResponse> res = service.addNeighbors(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public RemoveNeighborsResponse removeNeighbors(IotaNeighborsRequest request) throws Exception {
+    public RemoveNeighborsResponse removeNeighbors(IotaNeighborsRequest request) throws ArgumentException {
         final Call<RemoveNeighborsResponse> res = service.removeNeighbors(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public GetTipsResponse getTips(IotaCommandRequest request) throws Exception {
+    public GetTipsResponse getTips(IotaCommandRequest request) throws ArgumentException {
         final Call<GetTipsResponse> res = service.getTips(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public FindTransactionResponse findTransactions(IotaFindTransactionsRequest request) throws Exception {
+    public FindTransactionResponse findTransactions(IotaFindTransactionsRequest request) throws ArgumentException {
         final Call<FindTransactionResponse> res = service.findTransactions(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public GetInclusionStateResponse getInclusionStates(IotaGetInclusionStateRequest request) throws Exception {
+    public GetInclusionStateResponse getInclusionStates(IotaGetInclusionStateRequest request) throws ArgumentException {
         final Call<GetInclusionStateResponse> res = service.getInclusionStates(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public GetTrytesResponse getTrytes(IotaGetTrytesRequest request) throws Exception {
+    public GetTrytesResponse getTrytes(IotaGetTrytesRequest request) throws ArgumentException {
         final Call<GetTrytesResponse> res = service.getTrytes(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public GetTransactionsToApproveResponse getTransactionsToApprove(IotaGetTransactionsToApproveRequest request) throws Exception {
+    public GetTransactionsToApproveResponse getTransactionsToApprove(IotaGetTransactionsToApproveRequest request) throws ArgumentException {
         final Call<GetTransactionsToApproveResponse> res = service.getTransactionsToApprove(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public GetBalancesResponse getBalances(IotaGetBalancesRequest request) throws Exception {
+    public GetBalancesResponse getBalances(IotaGetBalancesRequest request) throws ArgumentException {
         final Call<GetBalancesResponse> res = service.getBalances(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public GetAttachToTangleResponse attachToTangle(IotaAttachToTangleRequest request) throws Exception {
+    public GetAttachToTangleResponse attachToTangle(IotaAttachToTangleRequest request) throws ArgumentException {
         final Call<GetAttachToTangleResponse> res = service.attachToTangle(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public InterruptAttachingToTangleResponse interruptAttachingToTangle(IotaCommandRequest request) throws Exception {
+    public InterruptAttachingToTangleResponse interruptAttachingToTangle(IotaCommandRequest request) throws ArgumentException {
         final Call<InterruptAttachingToTangleResponse> res = service.interruptAttachingToTangle(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public BroadcastTransactionsResponse broadcastTransactions(IotaBroadcastTransactionRequest request) throws Exception {
+    public BroadcastTransactionsResponse broadcastTransactions(IotaBroadcastTransactionRequest request) throws ArgumentException {
         final Call<BroadcastTransactionsResponse> res = service.broadcastTransactions(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public StoreTransactionsResponse storeTransactions(IotaStoreTransactionsRequest request) throws Exception {
+    public StoreTransactionsResponse storeTransactions(IotaStoreTransactionsRequest request) throws ArgumentException {
         final Call<StoreTransactionsResponse> res = service.storeTransactions(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public CheckConsistencyResponse checkConsistency(IotaCheckConsistencyRequest request) throws Exception {
+    public CheckConsistencyResponse checkConsistency(IotaCheckConsistencyRequest request) throws ArgumentException {
         final Call<CheckConsistencyResponse> res = service.checkConsistency(request);
         return wrapCheckedException(res).body();
     }
 
     @Override
-    public WereAddressesSpentFromResponse wereAddressesSpentFrom(IotaWereAddressesSpentFromRequest request) throws Exception {
+    public WereAddressesSpentFromResponse wereAddressesSpentFrom(IotaWereAddressesSpentFromRequest request) throws ArgumentException {
         final Call<WereAddressesSpentFromResponse> res = service.wereAddressesSpentFrom(request);
         return wrapCheckedException(res).body();
     }

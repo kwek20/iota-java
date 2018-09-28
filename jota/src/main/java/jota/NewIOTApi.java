@@ -1,9 +1,5 @@
 package jota;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,15 +13,15 @@ import jota.connection.HttpConnector;
 import jota.store.IotaFileStore;
 import jota.store.IotaStore;
 
-public class NewIOTApi {
+public class NewIOTApi extends OldIOTApi {
     
-    private static final String DEFAULT_PORT = "14265";
+    private static final int DEFAULT_PORT = 14265;
     private static final String DEFAULT_PROTOCOL = "http";
     private static final String DEFAULT_HOST = "localhost";
     
     private static final Logger log = LoggerFactory.getLogger(ConnectionFactory.class);
     
-    private List<Connection> nodes = new ArrayList<>();
+    
     
     private IotaStore store;
 
@@ -77,9 +73,11 @@ public class NewIOTApi {
         load();
     }
     
-    private void load() {
+    @Override
+    protected void load() {
+        IotaEnvConfig env = new IotaEnvConfig();
+        
         if (config == null) {
-            IotaEnvConfig env = new IotaEnvConfig();
             String configName = env.getConfigName();
             
             if (configName != null) {
@@ -91,15 +89,14 @@ public class NewIOTApi {
             
         if (config.hasNodes()) {
             for (Connection c : config.getNodes()) {
-                if (addNode(c)) {
-                    
-                }
+               addNode(c);
             }
         } else {
-            if (addNode(getDefaultNode())) {
-                
-            }
+            addNode(getFallbackNode(env));
         }
+        
+        //sets a single node to service, backwards compatibility
+        super.load();
     }
 
     public boolean addNode(Connection n) {
@@ -113,16 +110,15 @@ public class NewIOTApi {
         }
     }
     
-    public boolean hasNodes() {
-        return nodes != null && nodes.size() > 0;
-    }
-    
-    public Connection getRandomNode() {
-        if (!hasNodes()) return null;
-        return nodes.get(new Random().nextInt(nodes.size()));
-    }
-    
-    private Connection getDefaultNode() {
-        return new HttpConnector(DEFAULT_PROTOCOL, DEFAULT_HOST, DEFAULT_PORT);
+    private Connection getFallbackNode(IotaEnvConfig env) {
+        String prod = env.getLegacyProtocol();
+        String host = env.getLegacyHost();
+        int port = env.getLegacyPort();
+        
+        if (prod == null) prod = DEFAULT_PROTOCOL;
+        if (host == null) host = DEFAULT_HOST;
+        if (port == 0) port = DEFAULT_PORT;
+        
+        return new HttpConnector(prod, host, port);
     }
 }

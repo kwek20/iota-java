@@ -28,6 +28,7 @@ import jota.dto.response.InterruptAttachingToTangleResponse;
 import jota.dto.response.RemoveNeighborsResponse;
 import jota.dto.response.StoreTransactionsResponse;
 import jota.dto.response.WereAddressesSpentFromResponse;
+import jota.error.ArgumentException;
 
 public interface IotaApi {
     
@@ -36,37 +37,37 @@ public interface IotaApi {
      * Returns information about the node.
      * @throws Exception 
      */
-    GetNodeInfoResponse getNodeInfo(IotaCommandRequest request) throws Exception;
+    GetNodeInfoResponse getNodeInfo(IotaCommandRequest request) throws ArgumentException;
 
     /**
      * Get the list of neighbors from the node.
      * @throws Exception 
      */
-    GetNeighborsResponse getNeighbors(IotaCommandRequest request) throws Exception;
+    GetNeighborsResponse getNeighbors(IotaCommandRequest request) throws ArgumentException;
 
     /**
      * Add a list of neighbors to the node.
      * @throws Exception 
      */
-    AddNeighborsResponse addNeighbors(IotaNeighborsRequest request) throws Exception;
+    AddNeighborsResponse addNeighbors(IotaNeighborsRequest request) throws ArgumentException;
 
     /**
      * Removes a list of neighbors from the node.
      * @throws Exception 
      */
-    RemoveNeighborsResponse removeNeighbors(IotaNeighborsRequest request) throws Exception;
+    RemoveNeighborsResponse removeNeighbors(IotaNeighborsRequest request) throws ArgumentException;
 
     /**
      * Get the list of latest tips (unconfirmed transactions).
      * @throws Exception 
      */
-    GetTipsResponse getTips(IotaCommandRequest request) throws Exception;
+    GetTipsResponse getTips(IotaCommandRequest request) throws ArgumentException;
 
     /**
      * Find the transactions which match the specified input and return.
      * @throws Exception 
      */
-    FindTransactionResponse findTransactions(IotaFindTransactionsRequest request) throws Exception;
+    FindTransactionResponse findTransactions(IotaFindTransactionsRequest request) throws ArgumentException;
 
 
     /**
@@ -74,60 +75,60 @@ public interface IotaApi {
      * You can search for multiple tips (and thus, milestones) to get past inclusion states of transactions.
      * @throws Exception 
      */
-    GetInclusionStateResponse getInclusionStates(IotaGetInclusionStateRequest request) throws Exception;
+    GetInclusionStateResponse getInclusionStates(IotaGetInclusionStateRequest request) throws ArgumentException;
 
     /**
      * Returns the raw trytes data of a transaction.
      * @throws Exception 
      */
-    GetTrytesResponse getTrytes(IotaGetTrytesRequest request) throws Exception;
+    GetTrytesResponse getTrytes(IotaGetTrytesRequest request) throws ArgumentException;
 
     /**
      * Tip selection which returns trunkTransaction and branchTransaction.
      * The input value is the latest coordinator milestone, as provided through the getNodeInfo API call.
      * @throws Exception 
      */
-    GetTransactionsToApproveResponse getTransactionsToApprove(IotaGetTransactionsToApproveRequest request) throws Exception;
+    GetTransactionsToApproveResponse getTransactionsToApprove(IotaGetTransactionsToApproveRequest request) throws ArgumentException;
 
     /**
      * It returns the confirmed balance which a list of addresses have at the latest confirmed milestone.
      * @throws Exception 
      */
-    GetBalancesResponse getBalances(IotaGetBalancesRequest request) throws Exception;
+    GetBalancesResponse getBalances(IotaGetBalancesRequest request) throws ArgumentException;
 
     /**
      * Attaches the specified transactions (trytes) to the Tangle by doing Proof of Work.
      * @throws Exception 
      */
-    GetAttachToTangleResponse attachToTangle(IotaAttachToTangleRequest request) throws Exception;
+    GetAttachToTangleResponse attachToTangle(IotaAttachToTangleRequest request) throws ArgumentException;
 
     /**
      * Interrupts and completely aborts the attachToTangle process.
      * @throws Exception 
      */
-    InterruptAttachingToTangleResponse interruptAttachingToTangle(IotaCommandRequest request) throws Exception;
+    InterruptAttachingToTangleResponse interruptAttachingToTangle(IotaCommandRequest request) throws ArgumentException;
 
     /**
      * Broadcast a list of transactions to all neighbors. The input trytes for this call are provided by attachToTangle.
      * @throws Exception 
      */
-    BroadcastTransactionsResponse broadcastTransactions(IotaBroadcastTransactionRequest request) throws Exception;
+    BroadcastTransactionsResponse broadcastTransactions(IotaBroadcastTransactionRequest request) throws ArgumentException;
 
     /**
      * Store transactions into the local storage. The trytes to be used for this call are returned by attachToTangle.
      * @throws Exception 
      */
-    StoreTransactionsResponse storeTransactions(IotaStoreTransactionsRequest request) throws Exception;
+    StoreTransactionsResponse storeTransactions(IotaStoreTransactionsRequest request) throws ArgumentException;
 
     /**
      * Checks the consistency of the subtangle descirbed by the provided tails.
      * @throws Exception 
      */
-    CheckConsistencyResponse checkConsistency(IotaCheckConsistencyRequest request) throws Exception;
+    CheckConsistencyResponse checkConsistency(IotaCheckConsistencyRequest request) throws ArgumentException;
     
     /**
      * Check if a list of addresses was ever spent from, in the current epoch, or in previous epochs.
      * @throws Exception 
     */
-    WereAddressesSpentFromResponse wereAddressesSpentFrom(IotaWereAddressesSpentFromRequest request) throws Exception;
+    WereAddressesSpentFromResponse wereAddressesSpentFrom(IotaWereAddressesSpentFromRequest request) throws ArgumentException;
 }

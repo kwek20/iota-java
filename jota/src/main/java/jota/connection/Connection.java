@@ -9,4 +9,7 @@ public interface Connection extends IotaApi {
     void start();
     
     void stop();
+    
+    int port();
+    String url();
 }
