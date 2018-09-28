@@ -16,6 +16,6 @@ public class IotaEnvConfig extends IotaClientConfig {
     }
     
     public String getConfigName() {
-        return store.get(CONFIG_PARAM).toString();
+        return stringOrNull(CONFIG_PARAM);
     }
 }

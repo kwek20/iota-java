@@ -17,4 +17,6 @@ public interface IotaConfig {
      * @return
      */
     List<Connection> getNodes();
+
+    boolean hasNodes();
 }

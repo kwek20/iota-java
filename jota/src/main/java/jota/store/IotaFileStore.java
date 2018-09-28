@@ -1,9 +1,16 @@
 package jota.store;
 
+import java.io.File;
 import java.io.Serializable;
 
 public class IotaFileStore extends IotaClientStore {
 
+    private static final String DEFAULT_STORE = ".." + File.pathSeparator + "client.store";
+    
+    public IotaFileStore() {
+        super(new FlatFileStore(DEFAULT_STORE));
+    }
+    
     public IotaFileStore(String location) {
         super(new FlatFileStore(location));
     }
