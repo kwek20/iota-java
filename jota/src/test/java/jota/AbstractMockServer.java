@@ -1,6 +1,8 @@
 package jota;
 
 import org.apache.commons.io.IOUtils;
+import org.iota.jota.IotaAPI;
+import org.iota.jota.IotaAPICommands;
 import org.junit.After;
 import org.junit.Before;
 
@@ -18,10 +20,10 @@ public abstract class AbstractMockServer {
     }
 
     @Before
-    public void setUp() {
-
+    public void setUp() throws Exception {
+        iotaAPI = new IotaAPI();
         initJadler();
-        iotaAPI = new IotaAPI.Builder().protocol("http").host("localhost").port(Integer.toString(port())).build();
+        
     }
 
     @After

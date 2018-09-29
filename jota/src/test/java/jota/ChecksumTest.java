@@ -1,10 +1,11 @@
 package jota;
 
-import jota.error.ArgumentException;
-import jota.utils.Checksum;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+
+import org.iota.jota.error.ArgumentException;
+import org.iota.jota.utils.Checksum;
 
 /**
  * @author pinpong

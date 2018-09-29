@@ -2,9 +2,11 @@ package jota;
 
 import com.google.gson.Gson;
 import jota.category.IntegrationTest;
-import jota.dto.response.*;
-import jota.error.ArgumentException;
+
 import org.hamcrest.core.IsNull;
+import org.iota.jota.IotaAPI;
+import org.iota.jota.dto.response.*;
+import org.iota.jota.error.ArgumentException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -28,11 +30,11 @@ public class IotaCoreApiTest {
     private static final String TEST_ADDRESS_SPENT = "9SEGQNQHFHCAI9QXTVGBGTIZQDV9RSCGCGPQSPLNCNN9DSENFMLTD9SETUSYZCYG9JYPIAMXFHNT9YRFZ";
     private static final String TEST_ADDRESS_WITH_CHECKSUM = "YJNQ9EQWSXUMLFCIUZDCAJZSAXUQNZSY9AKKVYKKFBAAHRSTKSHUOCCFTQVPPASPGGC9YGNLDQNOUWCAWGWIJNRJMX";
     private static final String TEST_HASH = "OOAARHCXXCPMNZPUEYOOUIUCTWZSQGKNIECIKRBNUUJEVMLJAWGCXREXEQGNJUJKUXXQAWWAZYKB99999";
-    private static IotaAPICore proxy;
+    private static IotaAPI proxy;
 
     @Before
-    public void createProxyInstance() {
-        proxy = new IotaAPI.Builder().build();
+    public void createProxyInstance() throws Exception {
+        proxy = new IotaAPI();
     }
 
     @Test

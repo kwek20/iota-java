@@ -1,11 +1,12 @@
 package jota;
 
-import jota.dto.response.SendTransferResponse;
-import jota.error.ArgumentException;
-import jota.model.Transaction;
-import jota.model.Transfer;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.core.IsNull;
+import org.iota.jota.IotaAPI;
+import org.iota.jota.dto.response.SendTransferResponse;
+import org.iota.jota.error.ArgumentException;
+import org.iota.jota.model.Transaction;
+import org.iota.jota.model.Transfer;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,8 +29,8 @@ public class SendMessageTest {
     private IotaAPI iotaClient;
 
     @Before
-    public void createApiClientInstance() {
-        iotaClient = new IotaAPI.Builder().build();
+    public void createApiClientInstance() throws Exception {
+        iotaClient = new IotaAPI();
     }
 
     @Ignore

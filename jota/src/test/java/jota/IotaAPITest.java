@@ -2,15 +2,16 @@ package jota;
 
 import com.google.gson.Gson;
 import jota.category.IntegrationTest;
-import jota.dto.response.*;
-import jota.error.ArgumentException;
-import jota.model.Bundle;
-import jota.model.Input;
-import jota.model.Transaction;
-import jota.model.Transfer;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
+import org.iota.jota.IotaAPI;
+import org.iota.jota.dto.response.*;
+import org.iota.jota.error.ArgumentException;
+import org.iota.jota.model.Bundle;
+import org.iota.jota.model.Input;
+import org.iota.jota.model.Transaction;
+import org.iota.jota.model.Transfer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -72,48 +73,16 @@ public class IotaAPITest {
     private IotaAPI iotaAPI;
 
     @Before
-    public void createApiClientInstance() {
-        iotaAPI = new IotaAPI.Builder().port("80").build();
+    public void createApiClientInstance() throws Exception {
+        iotaAPI = new IotaAPI();
     }
 
     @Test
     public void shouldCreateIotaApiProxyInstanceWithDefaultValues() {
-        iotaAPI = new IotaAPI.Builder().build();
         assertThat(iotaAPI, IsNull.notNullValue());
         assertThat(iotaAPI.getHost(), Is.is("nodes.testnet.iota.org"));
         assertThat(iotaAPI.getPort(), Is.is("80"));
         assertThat(iotaAPI.getProtocol(), Is.is("http"));
-    }
-
-    @Test
-    public void shouldRetainValuesFromBuilder() {
-        iotaAPI = new IotaAPI.Builder().host("somewhere_over_the_rainbow").build();
-        assertThat(iotaAPI.getHost(), Is.is("somewhere_over_the_rainbow"));
-
-        iotaAPI = new IotaAPI.Builder().port("15515").build();
-        assertThat(iotaAPI.getPort(), Is.is("15515"));
-
-        iotaAPI = new IotaAPI.Builder().protocol("https").build();
-        assertThat(iotaAPI.getProtocol(), Is.is("https"));
-    }
-
-    @Test
-    public void shouldGetValuesFromProperties() {
-        Properties properties = new Properties();
-
-        properties.put("iota.node.host", "somewhere_over_the_rainbow");
-        iotaAPI = new IotaAPI.Builder().config(properties).build();
-        assertThat(iotaAPI.getHost(), Is.is("somewhere_over_the_rainbow"));
-
-        properties = new Properties();
-        properties.put("iota.node.port", "15515");
-        iotaAPI = new IotaAPI.Builder().config(properties).build();
-        assertThat(iotaAPI.getPort(), Is.is("15515"));
-
-        properties = new Properties();
-        properties.put("iota.node.protocol", "https");
-        iotaAPI = new IotaAPI.Builder().config(properties).build();
-        assertThat(iotaAPI.getProtocol(), Is.is("https"));
     }
 
     @Test
@@ -177,7 +146,7 @@ public class IotaAPITest {
         List<Transfer> transfers = new ArrayList<>();
 
         GetBalancesAndFormatResponse rsp = iotaAPI.getInputs(TEST_SEED1, 2, 0, 0, 0);
-
+        
         inputlist.addAll(rsp.getInputs());
 
         transfers.add(new Transfer(TEST_ADDRESS_WITH_CHECKSUM_SECURITY_LEVEL_2, 100, TEST_MESSAGE, TEST_TAG));

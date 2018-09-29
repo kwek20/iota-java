@@ -1,7 +1,7 @@
 package jota;
 
-import jota.utils.TrytesConverter;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.iota.jota.utils.TrytesConverter;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

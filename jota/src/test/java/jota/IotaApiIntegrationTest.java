@@ -1,13 +1,13 @@
 package jota;
 
-import jota.dto.response.GetBundleResponse;
-import jota.error.ArgumentException;
 import org.hamcrest.core.IsNull;
+import org.iota.jota.dto.response.GetBundleResponse;
+import org.iota.jota.error.ArgumentException;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import static jota.IotaAPICommands.GET_TRYTES;
+import static org.iota.jota.IotaAPICommands.GET_TRYTES;
 import static org.junit.Assert.assertThat;
 
 public class IotaApiIntegrationTest extends AbstractMockServer {

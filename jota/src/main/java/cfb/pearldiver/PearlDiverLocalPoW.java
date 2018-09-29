@@ -1,7 +1,7 @@
 package cfb.pearldiver;
 
-import jota.pow.IotaLocalPoW;
-import jota.utils.Converter;
+import org.iota.jota.pow.IotaLocalPoW;
+import org.iota.jota.utils.Converter;
 
 /**
  * Perform local PoW using Come-from-Beyond's PearlDiver implementation.

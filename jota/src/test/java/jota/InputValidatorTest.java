@@ -1,8 +1,8 @@
 package jota;
 
-import jota.error.ArgumentException;
-import jota.model.Transfer;
-import jota.utils.InputValidator;
+import org.iota.jota.error.ArgumentException;
+import org.iota.jota.model.Transfer;
+import org.iota.jota.utils.InputValidator;
 import org.junit.Test;
 
 import java.util.ArrayList;

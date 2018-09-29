@@ -1,10 +1,12 @@
 package jota;
 
 import cfb.pearldiver.PearlDiverLocalPoW;
-import jota.dto.response.SendTransferResponse;
-import jota.error.ArgumentException;
-import jota.model.Transfer;
+
 import org.hamcrest.core.IsNull;
+import org.iota.jota.IotaAPI;
+import org.iota.jota.dto.response.SendTransferResponse;
+import org.iota.jota.error.ArgumentException;
+import org.iota.jota.model.Transfer;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -29,8 +31,9 @@ public class IotaLocalPoWTest {
     private IotaAPI iotaClient;
 
     @Before
-    public void createApiClientInstance() {
-        iotaClient = new IotaAPI.Builder().localPoW(new PearlDiverLocalPoW()).build();
+    public void createApiClientInstance() throws Exception {
+        iotaClient = new IotaAPI();
+        iotaClient.setLocalPoW(new PearlDiverLocalPoW());
     }
 
     @Ignore
