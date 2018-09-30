@@ -9,7 +9,7 @@ public class IotaEnvConfig extends IotaClientConfig {
     private static final String ENV_HOST = "IOTA_NODE_HOST";
     private static final String ENV_PORT = "IOTA_NODE_PORT";
     
-    public IotaEnvConfig() {
+    public IotaEnvConfig() throws Exception {
         super(new EnvironmentStore());
     }
 

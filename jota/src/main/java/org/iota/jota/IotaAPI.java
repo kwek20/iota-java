@@ -1,6 +1,9 @@
 package org.iota.jota;
 
+import java.util.Arrays;
+
 import org.iota.jota.config.IotaConfig;
+import org.iota.jota.config.IotaDefaultConfig;
 import org.iota.jota.config.IotaEnvConfig;
 import org.iota.jota.config.IotaFileConfig;
 import org.iota.jota.connection.Connection;
@@ -28,6 +31,7 @@ public class IotaAPI extends IotaAPIExtended {
         
         this.store = builder.store;
         addNode(new HttpConnector(builder.protocol, builder.host, builder.port));
+        load();
     }
     
     /**
@@ -77,26 +81,47 @@ public class IotaAPI extends IotaAPIExtended {
     }
     
     @Override
-    protected void load() {
+    protected void load() throws Exception {
         IotaEnvConfig env = new IotaEnvConfig();
+        IotaDefaultConfig defaultConf = new IotaDefaultConfig();
         
         if (config == null) {
             String configName = env.getConfigName();
             
             if (configName != null) {
-                this.config = new IotaFileConfig(configName);
+                config = new IotaFileConfig(configName);
             } else {
-                this.config = new IotaFileConfig();
+                config = new IotaFileConfig();
             }
         }
+        
+        IotaConfig[] array = new IotaConfig[] {
+                config,
+                env,
+                defaultConf,
+        };
+        
+        Arrays.stream(array).forEachOrdered(config -> {
+            if (config.hasNodes()) {
+                for (Connection c : config.getNodes()) {
+                   addNode(c);
+                }
+            }
+        });
             
-        if (config.hasNodes()) {
-            for (Connection c : config.getNodes()) {
-               addNode(c);
-            }
-        } else {
-            addNode(getFallbackNode(env));
-        }
+        //Fallback on legacy option
+        if (!hasNodes()) {
+            Arrays.stream(array).forEachOrdered(config -> {
+                if (!hasNodes()) {
+                    if (config.getLegacyHost() != null) {
+                        addNode(new HttpConnector(
+                                config.getLegacyProtocol(), 
+                                config.getLegacyHost(), 
+                                config.getLegacyPort()));
+                    }
+                }
+            });
+        }   
         
         //sets a single node to service, backwards compatibility
         super.load();
@@ -106,24 +131,13 @@ public class IotaAPI extends IotaAPIExtended {
         try {
             n.start();
             nodes.add(n);
+            log.debug("Added node: " + n.toString());
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             log.warn("Failed to add node connection to pool due to " + e.getMessage());
             return false;
         }
-    }
-    
-    private Connection getFallbackNode(IotaEnvConfig env) {
-        String prod = env.getLegacyProtocol();
-        String host = env.getLegacyHost();
-        int port = env.getLegacyPort();
-        
-        if (prod == null) prod = DEFAULT_PROTOCOL;
-        if (host == null) host = DEFAULT_HOST;
-        if (port == 0) port = DEFAULT_PORT;
-        
-        return new HttpConnector(prod, host, port);
     }
     
     public static class Builder extends IotaAPICore.Builder<Builder> {

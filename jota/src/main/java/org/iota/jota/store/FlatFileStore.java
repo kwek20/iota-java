@@ -44,9 +44,9 @@ public class FlatFileStore implements Store {
                 fileReader = new FileReader(f);
                 bufferedReader = new BufferedReader(fileReader);
                 
+                properties.load(bufferedReader);
                 fileReader.close();
                 bufferedReader.close();
-                properties.load(bufferedReader);
             } catch (IOException e) {
                 log.debug(f.getName() + " not found. Rolling back for another solution...");
             } finally {

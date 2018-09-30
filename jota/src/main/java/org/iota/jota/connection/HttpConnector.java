@@ -132,6 +132,11 @@ public class HttpConnector implements Connection {
             throw new IllegalStateException(e.getMessage());
         }
     }
+    
+    @Override
+    public String toString() {
+        return protocol + "://" + host + ":" + port;
+    }
 
     @Override
     public GetNodeInfoResponse getNodeInfo(IotaCommandRequest request) throws ArgumentException {

@@ -2,17 +2,12 @@ package org.iota.jota;
 
 import static org.iota.jota.utils.Constants.*;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.Random;
 import java.util.stream.Stream;
 
-import org.iota.jota.IotaAPI.Builder;
 import org.iota.jota.config.IotaConfig;
 import org.iota.jota.config.IotaDefaultConfig;
 import org.iota.jota.config.IotaEnvConfig;
@@ -25,18 +20,12 @@ import org.iota.jota.model.Transaction;
 import org.iota.jota.pow.ICurl;
 import org.iota.jota.pow.IotaLocalPoW;
 import org.iota.jota.pow.SpongeFactory;
-import org.iota.jota.store.EnvironmentStore;
-import org.iota.jota.store.FlatFileStore;
 import org.iota.jota.utils.Checksum;
 import org.iota.jota.utils.InputValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class IotaAPICore {
-
-    protected static final int DEFAULT_PORT = 80;
-    protected static final String DEFAULT_PROTOCOL = "http";
-    protected static final String DEFAULT_HOST = "nodes.testnet.iota.org";
     
     private static final Logger log = LoggerFactory.getLogger(IotaAPICore.class);
 
@@ -56,10 +45,9 @@ public class IotaAPICore {
         customCurl = builder.customCurl;
     }
     
-    protected void load() {
+    protected void load() throws Exception {
         service = getRandomNode();
         setCurl( SpongeFactory.create(SpongeFactory.Mode.KERL));
-        System.out.println(service);
     }
     
     public boolean hasNodes() {
@@ -242,7 +230,6 @@ public class IotaAPICore {
         if (!InputValidator.isArrayOfHashes(hashes)) {
             throw new ArgumentException(INVALID_HASHES_INPUT_ERROR);
         }
-        
         return service.getTrytes(IotaGetTrytesRequest.createGetTrytesRequest(hashes));
     }
 
@@ -451,31 +438,36 @@ public class IotaAPICore {
         int port;
         IotaLocalPoW localPoW;
         
-        IotaConfig config = new IotaFileConfig();
+        IotaConfig config;
         
         private ICurl customCurl = SpongeFactory.create(SpongeFactory.Mode.KERL);
         
         public IotaAPICore build() throws Exception {
-            IotaConfig[] configs = new IotaConfig[] {
+            if (config == null){
+                config = new IotaFileConfig();
+            }
+            
+            // resolution order: builder value, configuration file, env, default value
+            Stream<IotaConfig> stream = Arrays.stream(new IotaConfig[] {
                     config,
                     new IotaEnvConfig(),
                     new IotaDefaultConfig(),
-            };
+            });
             
-            // resolution order: builder value, configuration file, env, default value
-            Stream<IotaConfig> stream = Arrays.stream(configs);
-            
-            stream.forEach(config -> {
-                if (null == protocol) {
-                    protocol = config.getLegacyProtocol();
-                }
-
-                if (null == host) {
-                    host = config.getLegacyHost();
-                }
-
-                if (0 == port) {
-                    port = config.getLegacyPort();
+            //TODO set options for all settings
+            stream.forEachOrdered(config -> {
+                if (config != null) {
+                    if (null == protocol) {
+                        protocol = config.getLegacyProtocol();
+                    }
+    
+                    if (null == host) {
+                        host = config.getLegacyHost();
+                    }
+    
+                    if (0 == port) {
+                        port = config.getLegacyPort();
+                    }
                 }
             });
             

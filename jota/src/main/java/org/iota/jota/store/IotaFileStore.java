@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public class IotaFileStore extends IotaClientStore {
 
-    private static final String DEFAULT_STORE = ".." + File.pathSeparator + "client.store";
+    private static final String DEFAULT_STORE = ".." + File.separator + "client.store";
     
     public IotaFileStore() {
         super(new FlatFileStore(DEFAULT_STORE));

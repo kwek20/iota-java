@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.iota.jota.IotaAPI.Builder;
-import org.iota.jota.dto.request.*;
 import org.iota.jota.dto.response.*;
 import org.iota.jota.error.ArgumentException;
 import org.iota.jota.error.BaseException;

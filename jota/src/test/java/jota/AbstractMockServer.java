@@ -21,8 +21,9 @@ public abstract class AbstractMockServer {
 
     @Before
     public void setUp() throws Exception {
-        iotaAPI = new IotaAPI();
         initJadler();
+        
+        iotaAPI = new IotaAPI();
         
     }
 

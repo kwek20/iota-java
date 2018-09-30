@@ -7,21 +7,21 @@ import org.iota.jota.store.FlatFileStore;
 
 public class IotaFileConfig extends IotaClientConfig {
 
-    private static final String DEFAULT_CONFIG_NAME = ".." + File.pathSeparator + "node_config.properties";
+    private static final String DEFAULT_CONFIG_NAME = ".." + File.separator + "node_config.properties";
     
     private static final String CONFIG_PROT = "iota.node.protocol";
     private static final String CONFIG_HOST = "iota.node.host";
     private static final String CONFIG_PORT = "iota.node.port";
     
-    public IotaFileConfig() {
+    public IotaFileConfig() throws Exception {
         super(new FlatFileStore(DEFAULT_CONFIG_NAME));
     }
 
-    public IotaFileConfig(String url) {
+    public IotaFileConfig(String url) throws Exception {
         super(new FlatFileStore(url));
     }
     
-    public IotaFileConfig(Optional<String> url) {
+    public IotaFileConfig(Optional<String> url) throws Exception {
         super(new FlatFileStore(url.isPresent() ? url.get() : DEFAULT_CONFIG_NAME));
     }
 

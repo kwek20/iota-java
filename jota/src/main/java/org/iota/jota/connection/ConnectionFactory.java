@@ -1,6 +1,7 @@
 package org.iota.jota.connection;
 
 import java.util.Map;
+import java.util.Properties;
 
 import org.iota.jota.connection.ConnectionType;
 import org.slf4j.Logger;
@@ -18,24 +19,28 @@ public class ConnectionFactory {
     
     private static final Logger log = LoggerFactory.getLogger(ConnectionFactory.class);
     
-    public static Connection createConnection(Map<String, String> configValues) {
-        if (!preRequirements(configValues)) {
+    public static Connection createConnection(Properties properties) {
+        if (!preRequirements(properties)) {
             log.error("Configuration of node missing critical sections. Required: " + 
                     KEY_TYPE + ", " + KEY_NAME + " and " + KEY_HOST);
             return null;
         }
         
-        ConnectionType type = ConnectionType.valueOf(configValues.get(KEY_TYPE));
-        if (type == null) return null;
+        ConnectionType type = ConnectionType.valueOf(propGetString(properties, KEY_TYPE));
+        if (type == null) {
+            log.error("Found unknown connection type. " + 
+                    KEY_TYPE + ", " + KEY_NAME + " and " + KEY_HOST);
+            return null;
+        }
         
-        String host = configValues.get(KEY_HOST);
+        String host = propGetString(properties, KEY_HOST);
         
         try {
             switch (type) {
             case HTTP:
                 int port = Integer.parseInt(KEY_PORT);
                 return new HttpConnector(
-                        configValues.get(KEY_PROTOCOL), 
+                        propGetString(properties, KEY_PROTOCOL), 
                         host, port);
             }
         } catch (Exception e) {
@@ -48,7 +53,18 @@ public class ConnectionFactory {
         return null;
     }
     
-    private static boolean preRequirements(Map<String, String> configValues) {
+    public static Connection createConnection(Map<String, String> configValues) {
+        Properties properties = new Properties();
+        properties.putAll(configValues);
+        return createConnection(properties);
+    }
+    
+    private static String propGetString(Properties properties, String key) {
+        Object o = properties.get(key);
+        return o != null ? o.toString() : null;
+    }
+    
+    private static boolean preRequirements(Properties configValues) {
         return !configValues.isEmpty() 
                 && configValues.containsKey(KEY_TYPE) 
                 && configValues.containsKey(KEY_NAME)

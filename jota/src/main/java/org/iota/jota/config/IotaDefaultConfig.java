@@ -2,10 +2,6 @@ package org.iota.jota.config;
 
 public class IotaDefaultConfig extends IotaClientConfig {
 
-    public IotaDefaultConfig() {
-        super(null);
-    }
-
     @Override
     public int getLegacyPort() {
         return 14265;

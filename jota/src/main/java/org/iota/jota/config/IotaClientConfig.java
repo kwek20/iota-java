@@ -2,6 +2,7 @@ package org.iota.jota.config;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Properties;
 
 import org.iota.jota.connection.Connection;
 import org.iota.jota.store.Store;
@@ -10,9 +11,14 @@ public abstract class IotaClientConfig implements IotaConfig {
     
     
     protected Store store;
+    
+    protected IotaClientConfig() {
+        
+    }
 
-    public IotaClientConfig(Store store) {
+    public IotaClientConfig(Store store) throws Exception {
         this.store = store;
+        this.store.load();
     }
 
     @Override
