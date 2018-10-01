@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.iota.jota.config.IotaConfig;
@@ -432,7 +433,7 @@ public class IotaAPICore {
     public String getPort() {
         return service.port() + "";
     }
-    
+   
     public static class Builder<T extends Builder<T>> {
         String protocol, host;
         int port;
