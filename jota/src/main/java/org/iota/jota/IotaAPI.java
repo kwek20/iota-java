@@ -140,7 +140,7 @@ public class IotaAPI extends IotaAPIExtended {
         }
     }
     
-    public static class Builder extends IotaAPICore.Builder<Builder> {
+    public static class Builder extends IotaAPICore.Builder<IotaAPI.Builder, IotaAPI> {
         
         private IotaStore store = new IotaFileStore();
         
@@ -150,7 +150,14 @@ public class IotaAPI extends IotaAPIExtended {
         }
 
         public IotaAPI build() throws Exception {
-            super.build();
+            //calculates IotaAPI specific values
+            
+            //Calculate rest and build
+            return super.build(); 
+        }
+        
+        @Override
+        protected IotaAPI compile() throws Exception {
             return new IotaAPI(this);
         }
     }

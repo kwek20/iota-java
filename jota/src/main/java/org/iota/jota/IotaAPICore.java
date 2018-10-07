@@ -434,7 +434,7 @@ public class IotaAPICore {
         return service.port() + "";
     }
    
-    public static class Builder<T extends Builder<T>> {
+    public static class Builder<T extends Builder<T, E>, E extends IotaAPICore> {
         String protocol, host;
         int port;
         IotaLocalPoW localPoW;
@@ -443,7 +443,7 @@ public class IotaAPICore {
         
         private ICurl customCurl = SpongeFactory.create(SpongeFactory.Mode.KERL);
         
-        public IotaAPICore build() throws Exception {
+        public E build() throws Exception {
             if (config == null){
                 config = new IotaFileConfig();
             }
@@ -471,9 +471,15 @@ public class IotaAPICore {
                     }
                 }
             });
-            
-
-            return new IotaAPICore(this);
+            return compile();
+        }
+        
+        /**
+         * Separated function so we don't generate 2 object instances (IotaAPICore and IotaApi)
+         * @return a filled IotaAPICore
+         */
+        protected E compile() throws Exception {
+            return (E) new IotaAPICore(this);
         }
         
         public T withCustomCurl(ICurl curl) {
