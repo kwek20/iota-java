@@ -670,6 +670,7 @@ public class IotaAPIExtended extends IotaAPICore {
 
         for (int i = 0; i < bundle.getTransactions().size(); i++) {
             Transaction trx = bundle.getTransactions().get(i);
+            System.out.println(trx);
             Long bundleValue = trx.getValue();
             totalSum += bundleValue;
 

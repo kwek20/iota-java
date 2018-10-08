@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class EnvironmentStore implements Store {
 
     @Override
-    public void load() throws Exception {
+    public void load() {
         //Do nothing :D
     }
 

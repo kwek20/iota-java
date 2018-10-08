@@ -30,8 +30,31 @@ public class IotaAPI extends IotaAPIExtended {
         super(builder);
         
         this.store = builder.store;
-        addNode(new HttpConnector(builder.protocol, builder.host, builder.port));
-        load();
+        this.config = builder.config;
+        
+        Arrays.stream(builder.getConfigs()).forEachOrdered(config -> {
+            if (config.hasNodes()) {
+                for (Connection c : config.getNodes()) {
+                   addNode(c);
+                }
+            }
+        });
+        
+        if (null != builder.host && null != builder.protocol && 0 != builder.port) {
+            addNode(new HttpConnector(builder.protocol, builder.host, builder.port));
+        } else {
+          //Fallback on legacy option from config
+            for (IotaConfig config : builder.getConfigs()) {
+                if (config.getLegacyHost() != null) {
+                    addNode(new HttpConnector(
+                            config.getLegacyProtocol(), 
+                            config.getLegacyHost(), 
+                            config.getLegacyPort()));
+                    
+                    break; //If we define one in config, dont check rest, its legacy after all.
+                }
+            }
+        }
     }
     
     /**
@@ -41,8 +64,7 @@ public class IotaAPI extends IotaAPIExtended {
      * @throws Exception If the config did not load for whatever reason
      */
     public IotaAPI() throws Exception {
-        this.store = new IotaFileStore();
-        load();
+        this(new Builder().generate());
     }
     
     /**
@@ -52,9 +74,7 @@ public class IotaAPI extends IotaAPIExtended {
      * @throws Exception If the config did not load for whatever reason
      */
     public IotaAPI(IotaStore store) throws Exception {
-        this.store = store;
-        
-        load();
+        this(new Builder().store(store).generate());
     }
     
     /**
@@ -64,7 +84,7 @@ public class IotaAPI extends IotaAPIExtended {
      * @throws Exception If the config did not load for whatever reason
      */
     public IotaAPI(IotaStore store, String config) throws Exception {
-        this(store, new IotaFileConfig(config));
+        this(new Builder().store(store).config(new IotaFileConfig(config)).generate());
     }
 
     /**
@@ -74,86 +94,32 @@ public class IotaAPI extends IotaAPIExtended {
      * @throws Exception If the config did not load for whatever reason
      */
     public IotaAPI(IotaStore store, IotaConfig iotaConfig) throws Exception {
-        this.store = store;
-        this.config = iotaConfig;
-        
-        load();
-    }
-    
-    @Override
-    protected void load() throws Exception {
-        IotaEnvConfig env = new IotaEnvConfig();
-        IotaDefaultConfig defaultConf = new IotaDefaultConfig();
-        
-        if (config == null) {
-            String configName = env.getConfigName();
-            
-            if (configName != null) {
-                config = new IotaFileConfig(configName);
-            } else {
-                config = new IotaFileConfig();
-            }
-        }
-        
-        IotaConfig[] array = new IotaConfig[] {
-                config,
-                env,
-                defaultConf,
-        };
-        
-        Arrays.stream(array).forEachOrdered(config -> {
-            if (config.hasNodes()) {
-                for (Connection c : config.getNodes()) {
-                   addNode(c);
-                }
-            }
-        });
-            
-        //Fallback on legacy option
-        if (!hasNodes()) {
-            Arrays.stream(array).forEachOrdered(config -> {
-                if (!hasNodes()) {
-                    if (config.getLegacyHost() != null) {
-                        addNode(new HttpConnector(
-                                config.getLegacyProtocol(), 
-                                config.getLegacyHost(), 
-                                config.getLegacyPort()));
-                    }
-                }
-            });
-        }   
-        
-        //sets a single node to service, backwards compatibility
-        super.load();
-    }
-
-    public boolean addNode(Connection n) {
-        try {
-            n.start();
-            nodes.add(n);
-            log.debug("Added node: " + n.toString());
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.warn("Failed to add node connection to pool due to " + e.getMessage());
-            return false;
-        }
+        this(new Builder().store(store).config(iotaConfig).generate());
     }
     
     public static class Builder extends IotaAPICore.Builder<IotaAPI.Builder, IotaAPI> {
         
-        private IotaStore store = new IotaFileStore();
+        private IotaStore store;
         
-        public Builder withCustomStore(IotaStore store) {
+        public Builder store(IotaStore store) {
             this.store = store;
             return this;
         }
 
-        public IotaAPI build() throws Exception {
-            //calculates IotaAPI specific values
+        @Override
+        public Builder generate() throws Exception {
+            //If a config is specified through ENV, that one will be in the stream, otherwise default config is used
+            Arrays.stream(getConfigs()).forEachOrdered(config -> {
+                if (config != null) {
+                    //calculate IotaApi specific values
+                    
+                    if (null == store) {
+                        store = config.getStore();
+                    }
+                }
+            });
             
-            //Calculate rest and build
-            return super.build(); 
+            return super.generate();
         }
         
         @Override

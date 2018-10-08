@@ -22,11 +22,6 @@ public abstract class IotaClientConfig implements IotaConfig {
     }
 
     @Override
-    public boolean canWrite() {
-        return store.canWrite();
-    }
-
-    @Override
     public List<Connection> getNodes() {
         return null;
     }

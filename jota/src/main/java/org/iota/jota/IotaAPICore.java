@@ -46,11 +46,6 @@ public class IotaAPICore {
         customCurl = builder.customCurl;
     }
     
-    protected void load() throws Exception {
-        service = getRandomNode();
-        setCurl( SpongeFactory.create(SpongeFactory.Mode.KERL));
-    }
-    
     public boolean hasNodes() {
         return nodes != null && nodes.size() > 0;
     }
@@ -58,6 +53,31 @@ public class IotaAPICore {
     public Connection getRandomNode() {
         if (!hasNodes()) return null;
         return nodes.get(new Random().nextInt(nodes.size()));
+    }
+    
+    public boolean addNode(Connection n) {
+        try {
+            for (Connection c : nodes) {
+                if (c.toString().equals(n.toString())) {
+                    log.warn("Tried to add a node we allready have: " + n);
+                    return true;
+                }
+            }
+            
+            n.start();
+            
+            //Huray! Lets add it
+            nodes.add(n);
+            log.debug("Added node: " + n.toString());
+            System.out.println("Added node: " + n.toString());
+            //Legacy wants a node in service for getting ports etc
+            if (null == service) service = n;
+            
+            return true;
+        } catch (Exception e) {
+            log.warn("Failed to add node connection to pool due to " + e.getMessage());
+            return false;
+        }
     }
     
     public ICurl getCurl() {
@@ -141,7 +161,6 @@ public class IotaAPICore {
                 .byTags(tags)
                 .byApprovees(approvees)
                 .byBundles(bundles);
-
         return service.findTransactions(findTransRequest);
     }
 
@@ -410,6 +429,7 @@ public class IotaAPICore {
      *
      * @return The protocol to use when connecting to the remote node.
      */
+    @Deprecated
     public String getProtocol() {
         //Should be carefull, its still possible to not display the protocol if url doesn't contain :
         //Will never break because a split on not found character returns the entire string in [0]
@@ -421,6 +441,7 @@ public class IotaAPICore {
      *
      * @return The host you want to connect to.
      */
+    @Deprecated
     public String getHost() {
         return service.url().split("://")[1];
     }
@@ -430,6 +451,7 @@ public class IotaAPICore {
      *
      * @return The port of the host you want to connect to.
      */
+    @Deprecated
     public String getPort() {
         return service.port() + "";
     }
@@ -444,19 +466,12 @@ public class IotaAPICore {
         private ICurl customCurl = SpongeFactory.create(SpongeFactory.Mode.KERL);
         
         public E build() throws Exception {
-            if (config == null){
-                config = new IotaFileConfig();
-            }
-            
-            // resolution order: builder value, configuration file, env, default value
-            Stream<IotaConfig> stream = Arrays.stream(new IotaConfig[] {
-                    config,
-                    new IotaEnvConfig(),
-                    new IotaDefaultConfig(),
-            });
-            
-            //TODO set options for all settings
-            stream.forEachOrdered(config -> {
+            generate();
+            return compile();
+        }
+        
+        protected T generate() throws Exception {
+            Arrays.stream(getConfigs()).forEachOrdered(config -> {
                 if (config != null) {
                     if (null == protocol) {
                         protocol = config.getLegacyProtocol();
@@ -471,9 +486,29 @@ public class IotaAPICore {
                     }
                 }
             });
-            return compile();
+            return (T) this;
         }
         
+        protected IotaConfig[] getConfigs() throws Exception {
+            IotaEnvConfig env = new IotaEnvConfig();
+            
+            if (config == null) {
+                String configName = env.getConfigName();
+                
+                if (configName != null) {
+                    config = new IotaFileConfig(configName);
+                } else {
+                    config = new IotaFileConfig();
+                }
+            }
+            
+            return new IotaConfig[] {
+                    config,
+                    env,
+                    new IotaDefaultConfig(),
+            };
+        }
+
         /**
          * Separated function so we don't generate 2 object instances (IotaAPICore and IotaApi)
          * @return a filled IotaAPICore

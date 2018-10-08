@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Optional;
 
 import org.iota.jota.store.FlatFileStore;
+import org.iota.jota.store.IotaFileStore;
+import org.iota.jota.store.IotaStore;
 
 public class IotaFileConfig extends IotaClientConfig {
 
@@ -12,6 +14,8 @@ public class IotaFileConfig extends IotaClientConfig {
     private static final String CONFIG_PROT = "iota.node.protocol";
     private static final String CONFIG_HOST = "iota.node.host";
     private static final String CONFIG_PORT = "iota.node.port";
+    
+    private static final String CONFIG_STORE = "storage_file";
     
     public IotaFileConfig() throws Exception {
         super(new FlatFileStore(DEFAULT_CONFIG_NAME));
@@ -38,5 +42,10 @@ public class IotaFileConfig extends IotaClientConfig {
     @Override
     public String getLegacyHost() {
         return stringOrNull(CONFIG_HOST);
+    }
+
+    @Override
+    public IotaStore getStore() {
+        return new IotaFileStore(stringOrNull(CONFIG_STORE));
     }
 }

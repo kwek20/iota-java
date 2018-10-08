@@ -1,5 +1,8 @@
 package org.iota.jota.config;
 
+import org.iota.jota.store.IotaFileStore;
+import org.iota.jota.store.IotaStore;
+
 public class IotaDefaultConfig extends IotaClientConfig {
 
     @Override
@@ -16,10 +19,10 @@ public class IotaDefaultConfig extends IotaClientConfig {
     public String getLegacyHost() {
         return "localhost";
     }
-    
+
     @Override
-    public boolean canWrite() {
-        return false;
+    public IotaStore getStore() {
+        return new IotaFileStore();
     }
 
 }

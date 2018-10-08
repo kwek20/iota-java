@@ -1,6 +1,8 @@
 package org.iota.jota.config;
 
 import org.iota.jota.store.EnvironmentStore;
+import org.iota.jota.store.IotaFileStore;
+import org.iota.jota.store.IotaStore;
 
 public class IotaEnvConfig extends IotaClientConfig {
 
@@ -8,14 +10,10 @@ public class IotaEnvConfig extends IotaClientConfig {
     private static final String ENV_PROT = "IOTA_NODE_PROTOCOL";
     private static final String ENV_HOST = "IOTA_NODE_HOST";
     private static final String ENV_PORT = "IOTA_NODE_PORT";
+    private static final String ENV_STORE = "IOTA_STORE_LOCATION";
     
     public IotaEnvConfig() throws Exception {
         super(new EnvironmentStore());
-    }
-
-    @Override
-    public boolean canWrite() {
-        return false;
     }
     
     public String getConfigName() {
@@ -35,5 +33,10 @@ public class IotaEnvConfig extends IotaClientConfig {
     @Deprecated
     public String getLegacyHost() {
         return stringOrNull(ENV_HOST);
+    }
+
+    @Override
+    public IotaStore getStore() {
+        return new IotaFileStore(stringOrNull(ENV_STORE));
     }
 }

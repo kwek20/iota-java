@@ -13,7 +13,7 @@ public class IotaFileStore extends IotaClientStore {
     }
     
     public IotaFileStore(String location) {
-        super(new FlatFileStore(location));
+        super(new FlatFileStore(null != location ? location : DEFAULT_STORE));
     }
     
     public IotaFileStore(Optional<String> location) {

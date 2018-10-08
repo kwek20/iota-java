@@ -74,7 +74,9 @@ public class HttpConnector implements Connection {
 
         // Create OkHttpBuilder
         final OkHttpClient client = new OkHttpClient.Builder()
-                .readTimeout(5000, TimeUnit.SECONDS)
+                .connectTimeout(500, TimeUnit.SECONDS)
+                .writeTimeout(500, TimeUnit.SECONDS)
+                .readTimeout(500, TimeUnit.SECONDS)
                 .addInterceptor(new Interceptor() {
                     @Override
                     public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -88,7 +90,6 @@ public class HttpConnector implements Connection {
                         return chain.proceed(newRequest);
                     }
                 })
-                .connectTimeout(5000, TimeUnit.SECONDS)
                 .build();
 
         // use client to create Retrofit service
@@ -97,6 +98,7 @@ public class HttpConnector implements Connection {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
+        
 
         service = retrofit.create(IotaAPIHTTPService.class);
     }
