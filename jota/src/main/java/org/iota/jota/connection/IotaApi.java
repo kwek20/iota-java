@@ -69,32 +69,31 @@ public interface IotaApi {
      */
     FindTransactionResponse findTransactions(IotaFindTransactionsRequest request) throws ArgumentException;
 
-
+    /**
+     * Returns the raw trytes data of a transaction.
+     * @throws Exception 
+     */
+    GetTrytesResponse getTrytes(IotaGetTrytesRequest request) throws ArgumentException;
+    
     /**
      * Get the inclusion states of a set of transactions. This is for determining if a transaction was accepted and confirmed by the network or not.
      * You can search for multiple tips (and thus, milestones) to get past inclusion states of transactions.
      * @throws Exception 
      */
     GetInclusionStateResponse getInclusionStates(IotaGetInclusionStateRequest request) throws ArgumentException;
-
+  
     /**
-     * Returns the raw trytes data of a transaction.
+     * It returns the confirmed balance which a list of addresses have at the latest confirmed milestone.
      * @throws Exception 
      */
-    GetTrytesResponse getTrytes(IotaGetTrytesRequest request) throws ArgumentException;
-
+    GetBalancesResponse getBalances(IotaGetBalancesRequest request) throws ArgumentException;
+    
     /**
      * Tip selection which returns trunkTransaction and branchTransaction.
      * The input value is the latest coordinator milestone, as provided through the getNodeInfo API call.
      * @throws Exception 
      */
     GetTransactionsToApproveResponse getTransactionsToApprove(IotaGetTransactionsToApproveRequest request) throws ArgumentException;
-
-    /**
-     * It returns the confirmed balance which a list of addresses have at the latest confirmed milestone.
-     * @throws Exception 
-     */
-    GetBalancesResponse getBalances(IotaGetBalancesRequest request) throws ArgumentException;
 
     /**
      * Attaches the specified transactions (trytes) to the Tangle by doing Proof of Work.
@@ -115,20 +114,20 @@ public interface IotaApi {
     BroadcastTransactionsResponse broadcastTransactions(IotaBroadcastTransactionRequest request) throws ArgumentException;
 
     /**
-     * Store transactions into the local storage. The trytes to be used for this call are returned by attachToTangle.
+     * Store transactions into the nodes local storage. The trytes to be used for this call are returned by attachToTangle.
      * @throws Exception 
      */
     StoreTransactionsResponse storeTransactions(IotaStoreTransactionsRequest request) throws ArgumentException;
-
-    /**
-     * Checks the consistency of the subtangle descirbed by the provided tails.
-     * @throws Exception 
-     */
-    CheckConsistencyResponse checkConsistency(IotaCheckConsistencyRequest request) throws ArgumentException;
     
     /**
      * Check if a list of addresses was ever spent from, in the current epoch, or in previous epochs.
      * @throws Exception 
     */
     WereAddressesSpentFromResponse wereAddressesSpentFrom(IotaWereAddressesSpentFromRequest request) throws ArgumentException;
+
+    /**
+     * Checks the consistency of the subtangle described by the provided tails.
+     * @throws Exception 
+     */
+    CheckConsistencyResponse checkConsistency(IotaCheckConsistencyRequest request) throws ArgumentException;
 }

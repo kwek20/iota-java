@@ -31,12 +31,27 @@ public class Constants {
      * The length of an message
      */
     public static int MESSAGE_LENGTH = 2187;
+    
+    /**
+     * The length of a transaction
+     */
+    public static final int TRANSACTION_LENGTH = 2673;
+    
+    /**
+     * Max number represented in 27 trits
+     */
+    public static final long TRANSACTION_UPPER_BOUND_MAX = 3_812_798_742_493L;
 
     /**
      * The length of an tag
      */
     public static int TAG_LENGTH = 27;
 
+    public static final String ARRAY_NULL_OR_EMPTY = "Array cannot be null or empty";
+    
+    public static final String INVALID_THRESHOLD_ERROR = "Invalid threshold provided. (Between 0 and 100 incl.)";
+    public static final String INVALID_APPROVE_DEPTH_ERROR = "Invalid depth provided. (Between 0 and 15, soft upper bound)";
+    
     public static final String INVALID_TRYTES_INPUT_ERROR = "Invalid trytes provided.";
     public static final String INVALID_HASHES_INPUT_ERROR = "Invalid hashes provided.";
     public static final String INVALID_TAIL_HASH_INPUT_ERROR = "Invalid tail hash provided.";
@@ -63,5 +78,6 @@ public class Constants {
     public static final String SENDING_TO_USED_ADDRESS_ERROR = "Sending to a used address.";
     public static final String PRIVATE_KEY_REUSE_ERROR = "Private key reuse detect!";
     public static final String SEND_TO_INPUTS_ERROR = "Send to inputs!";
+    
 }
 

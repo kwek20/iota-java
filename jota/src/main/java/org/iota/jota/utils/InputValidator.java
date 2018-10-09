@@ -104,15 +104,36 @@ public class InputValidator {
     }
 
     /**
-     * Determines whether the specified string array contains only trytes.
+     * Determines whether the specified string array contains only trytes, and 
+     * Deprecated - Use isArrayOfRawTransactionTrytes
+     * @param trytes The trytes array to validate.
+     * @return <code>true</code> if the specified array contains only valid trytes otherwise, <code>false</code>.
+     **/
+    @Deprecated
+    public static boolean isArrayOfTrytes(String[] trytes) {
+        return isArrayOfTrytes(trytes, Constants.TRANSACTION_LENGTH);
+    }
+    
+    /**
+     * Determines whether the specified string array contains only trytes, and 
      *
      * @param trytes The trytes array to validate.
      * @return <code>true</code> if the specified array contains only valid trytes otherwise, <code>false</code>.
      **/
-    public static boolean isArrayOfTrytes(String[] trytes) {
+    public static boolean isArrayOfRawTransactionTrytes(String[] trytes) {
+        return isArrayOfTrytes(trytes, Constants.TRANSACTION_LENGTH);
+    }
+    
+    /**
+     * Determines whether the specified string array contains only trytes.
+     *
+     * @param trytes The trytes array to validate.
+     * @param length The length each String should be
+     * @return <code>true</code> if the specified array contains only valid trytes otherwise, <code>false</code>.
+     **/
+    public static boolean isArrayOfTrytes(String[] trytes, int length) {
         for (String tryte : trytes) {
-            // Check if correct 2673 trytes
-            if (!isTrytes(tryte, 2673)) {
+            if (!isTrytes(tryte, length)) {
                 return false;
             }
         }
@@ -131,17 +152,26 @@ public class InputValidator {
 
         for (String hash : hashes) {
             // Check if address with checksum
-            if (hash.length() == 90) {
-                if (!isTrytes(hash, 90)) {
+            if (hash.length() == Constants.ADDRESS_LENGTH_WITH_CHECKSUM) {
+                if (!isTrytes(hash, Constants.ADDRESS_LENGTH_WITH_CHECKSUM)) {
                     return false;
                 }
             } else {
-                if (!isTrytes(hash, 81)) {
+                if (!isTrytes(hash, Constants.ADDRESS_LENGTH_WITHOUT_CHECKSUM)) {
                     return false;
                 }
             }
         }
         return true;
+    }
+    
+    /**
+     * Checks if the array is not null and not empty
+     * @param data The array with data
+     * @return <code>true</code> if the array is valid; otherwise, <code>false</code>.
+     */
+    public static boolean isStringArrayValid(String[] data) {
+        return null != data && 0 != data.length;
     }
 
     /**
@@ -213,7 +243,7 @@ public class InputValidator {
      **/
     public static boolean isHashes(List<String> hashes) {
         for (String hash : hashes) {
-            if (!isTrytes(hash, 81)) {
+            if (!isTrytes(hash, Constants.ADDRESS_LENGTH_WITHOUT_CHECKSUM)) {
                 return false;
             }
         }
@@ -227,28 +257,30 @@ public class InputValidator {
      * @return <code>true</code> if the specified hash are valid; otherwise, <code>false</code>.
      **/
     public static boolean isHash(String hash) {
-        if (!isTrytes(hash, 81)) {
+        if (!isTrytes(hash, Constants.ADDRESS_LENGTH_WITHOUT_CHECKSUM)) {
             return false;
         }
         return true;
     }
-
+    
     /**
      * Checks if attached trytes if last 241 trytes are non-zero
-     *
+     * the last 243 trytes basically consist of the: trunkTransaction + branchTransaction + nonce
      * @param trytes The trytes.
-     * @return <code>true</code> if the specified trytes are valid; otherwise, <code>false</code>.
+     * @return <code>true</code> if the specified trytes are valid/non 9s; otherwise, <code>false</code>.
      **/
     public static boolean isArrayOfAttachedTrytes(String[] trytes) {
-
         for (String tryteValue : trytes) {
 
             // Check if correct 2673 trytes
-            if (!isTrytes(tryteValue, 2673)) {
+            if (!isTrytes(tryteValue, Constants.TRANSACTION_LENGTH)) {
                 return false;
             }
 
-            String lastTrytes = tryteValue.substring(2673 - (3 * 81));
+            String lastTrytes = tryteValue.substring(
+                    Constants.TRANSACTION_LENGTH - (
+                            3 * Constants.ADDRESS_LENGTH_WITHOUT_CHECKSUM)
+                    );
 
             if (isNinesTrytes(lastTrytes, lastTrytes.length())) {
                 return false;

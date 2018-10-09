@@ -55,6 +55,8 @@ public class IotaAPI extends IotaAPIExtended {
                 }
             }
         }
+        
+        log.info(this.toString());
     }
     
     /**
@@ -95,6 +97,27 @@ public class IotaAPI extends IotaAPIExtended {
      */
     public IotaAPI(IotaStore store, IotaConfig iotaConfig) throws Exception {
         this(new Builder().store(store).config(iotaConfig).generate());
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder("----------------------");
+        builder.append(System.getProperty("line.separator"));
+        builder.append("iota-java started, configured with the following: ");
+        
+        builder.append(System.getProperty("line.separator"));
+        builder.append("Config file: " + config);
+        
+        builder.append(System.getProperty("line.separator"));
+        builder.append("Storage file: " + store);
+        
+        builder.append(System.getProperty("line.separator"));
+        builder.append("Registrered nodes: " + System.getProperty("line.separator"));
+        for (Connection n : nodes) {
+            builder.append(n.toString() + System.getProperty("line.separator"));
+        }
+        
+        return builder.toString();
     }
     
     public static class Builder extends IotaAPICore.Builder<IotaAPI.Builder, IotaAPI> {

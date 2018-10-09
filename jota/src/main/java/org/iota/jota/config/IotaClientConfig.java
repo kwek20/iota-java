@@ -50,4 +50,9 @@ public abstract class IotaClientConfig implements IotaConfig {
             return 0;
         }
     }
+    
+    @Override
+    public String toString() {
+        return store.toString();
+    }
 }

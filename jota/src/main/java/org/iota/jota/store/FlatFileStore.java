@@ -105,4 +105,9 @@ public class FlatFileStore implements Store {
     public boolean canWrite() {
         return true;
     }
+    
+    @Override
+    public String toString() {
+        return f.getName();
+    }
 }

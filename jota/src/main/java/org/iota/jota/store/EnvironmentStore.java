@@ -35,4 +35,9 @@ public class EnvironmentStore implements Store {
     public boolean canWrite() {
         return false;
     }
+    
+    @Override
+    public String toString() {
+        return "Environment variables";
+    }
 }

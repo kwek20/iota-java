@@ -15,7 +15,7 @@ public class IotaFileConfig extends IotaClientConfig {
     private static final String CONFIG_HOST = "iota.node.host";
     private static final String CONFIG_PORT = "iota.node.port";
     
-    private static final String CONFIG_STORE = "storage_file";
+    private static final String CONFIG_STORE = "storage.url";
     
     public IotaFileConfig() throws Exception {
         super(new FlatFileStore(DEFAULT_CONFIG_NAME));

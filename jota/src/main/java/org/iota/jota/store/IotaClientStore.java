@@ -57,4 +57,9 @@ public class IotaClientStore implements IotaStore {
     public boolean canWrite() {
         return store.canWrite();
     }
+    
+    @Override
+    public String toString() {
+        return store.toString();
+    }
 }
