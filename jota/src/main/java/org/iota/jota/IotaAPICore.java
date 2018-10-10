@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 import org.iota.jota.config.IotaConfig;
 import org.iota.jota.config.IotaDefaultConfig;
@@ -26,6 +24,11 @@ import org.iota.jota.utils.InputValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * Provides all IRI core API calls, with some helpers for optional parameters.
+ * Checks all parameters for correct values.
+ */
 public class IotaAPICore {
     
     private static final Logger log = LoggerFactory.getLogger(IotaAPICore.class);
@@ -257,7 +260,6 @@ public class IotaAPICore {
      * @return The transaction hashes which are returned depend on the input.
      * @throws ArgumentException 
      */
-    @Deprecated
     public FindTransactionResponse findTransactionsByTags(final String... tags) throws ArgumentException {
         if (!InputValidator.isStringArrayValid(tags)) {
             throw new ArgumentException(ARRAY_NULL_OR_EMPTY);
