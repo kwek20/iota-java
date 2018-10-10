@@ -12,7 +12,7 @@ import org.iota.jota.connection.ConnectionFactory;
 import org.iota.jota.connection.HttpConnector;
 
 import org.iota.jota.store.IotaStore;
-
+import org.iota.jota.stream.IotaStreamingApi;
 import org.iota.jota.stream.StreamingApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,12 +65,21 @@ public class IotaAPI extends IotaAPIExtended {
     }
     
     /**
+     * Sets a custom streaming API.
+     * By default we use the {@link IotaStreamingApi}
+     * @param api the streaming API to use
+     */
+    public void setStreamingApi(StreamingApi api) {
+        this.streamApi = api;
+    }
+    
+    /**
      * Get the streaming API used to listen/subscribe & request values
      * @return the streaming API
      */
     public StreamingApi getStreamApi() {
         if (!(null == streamApi)) {
-            streamApi = new StreamingApi(store);
+            streamApi = new IotaStreamingApi(store);
         }
         
         return streamApi;
