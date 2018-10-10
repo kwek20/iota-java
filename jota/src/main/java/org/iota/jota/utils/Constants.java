@@ -43,10 +43,11 @@ public class Constants {
     public static final long TRANSACTION_UPPER_BOUND_MAX = 3_812_798_742_493L;
 
     /**
-     * The length of an tag
+     * The length of an tag in trytes
      */
     public static int TAG_LENGTH = 27;
-
+    
+    
     public static final String ARRAY_NULL_OR_EMPTY = "Array cannot be null or empty";
     
     public static final String INVALID_THRESHOLD_ERROR = "Invalid threshold provided. (Between 0 and 100 incl.)";

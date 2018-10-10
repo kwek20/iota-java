@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 
- * Provides all IRI core API calls, with some helpers for optional parameters.
+ * Provides all node(IRI) core API calls, with some helpers for optional parameters.
  * Checks all parameters for correct values.
  */
 public class IotaAPICore {
@@ -40,11 +40,7 @@ public class IotaAPICore {
     
     private Connection service = null;
     
-    protected IotaAPICore() {
-        
-    }
-    
-    protected IotaAPICore(Builder builder) {
+    protected <T extends Builder<T, E>, E extends IotaAPICore> IotaAPICore(Builder<T, E> builder) {
         localPoW = builder.localPoW;
         customCurl = builder.customCurl;
     }
@@ -557,6 +553,9 @@ public class IotaAPICore {
         return service.port() + "";
     }
    
+    //All casts are to T, and are okay unless you do really weird things.
+    //Warnings are annoying
+    @SuppressWarnings("unchecked")
     public static class Builder<T extends Builder<T, E>, E extends IotaAPICore> {
         String protocol, host;
         int port;

@@ -30,6 +30,7 @@ public class IotaCoreApiTest {
     private static final String TEST_ADDRESS_SPENT = "9SEGQNQHFHCAI9QXTVGBGTIZQDV9RSCGCGPQSPLNCNN9DSENFMLTD9SETUSYZCYG9JYPIAMXFHNT9YRFZ";
     private static final String TEST_ADDRESS_WITH_CHECKSUM = "YJNQ9EQWSXUMLFCIUZDCAJZSAXUQNZSY9AKKVYKKFBAAHRSTKSHUOCCFTQVPPASPGGC9YGNLDQNOUWCAWGWIJNRJMX";
     private static final String TEST_HASH = "OOAARHCXXCPMNZPUEYOOUIUCTWZSQGKNIECIKRBNUUJEVMLJAWGCXREXEQGNJUJKUXXQAWWAZYKB99999";
+    private static final String TEST_TAG = "UDVNDYCCNLIXWUNSCBXDLH9LTSY";
     private static IotaAPI proxy;
 
     @Before
@@ -113,7 +114,7 @@ public class IotaCoreApiTest {
     @Test
     @Category(IntegrationTest.class)
     public void shouldFindTransactionsByDigests() throws ArgumentException {
-        FindTransactionResponse trans = proxy.findTransactionsByDigests(TEST_HASH);
+        FindTransactionResponse trans = proxy.findTransactionsByTags(TEST_TAG);
         assertThat(trans.getHashes(), IsNull.notNullValue());
     }
 
