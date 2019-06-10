@@ -402,6 +402,10 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <configuration>
+					              <keyname>${env.GPG_KEYNAME}</keyname>
+					              <passphraseServerId>${env.GPG_PASSPHRASE}</passphraseServerId>
+					            </configuration>
                             </execution>
                         </executions>
                     </plugin>
