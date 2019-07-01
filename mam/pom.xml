@@ -12,6 +12,11 @@
     <artifactId>jota-mam</artifactId>
 
     <dependencies>
+    	<dependency>
+    		<groupId>org.iota</groupId>
+    		<artifactId>jota</artifactId>
+    		<version>1.0.0-beta5</version>
+    	</dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
