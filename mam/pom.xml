@@ -18,14 +18,15 @@
     		<artifactId>jota</artifactId>
     		<version>1.0.0-beta5</version>
     	</dependency>
-    	
-    	<dependency>
-		    <groupId>org.scijava</groupId>
-		    <artifactId>native-lib-loader</artifactId>
-		    <version>2.3.4</version>
-		</dependency>
+
+	    <dependency>
+	      <groupId>org.scijava</groupId>
+	      <artifactId>native-lib-loader</artifactId>
+	      <version>2.0.2</version>
+	    </dependency>
     </dependencies>
 
+    
     <build>
         <plugins>
             <plugin>
@@ -40,6 +41,12 @@
                             <narSystemPackage>org.iota.jota</narSystemPackage>
                         </library>
                     </libraries>
+                    
+                    <linker>
+                    	<libSet>
+                    	
+                    	</libSet>
+                    </linker>
                 </configuration>
             </plugin>
 			
