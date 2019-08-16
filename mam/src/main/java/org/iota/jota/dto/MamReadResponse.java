@@ -1,8 +1,8 @@
-package org.iota.jota;
+package org.iota.jota.dto;
 
 import org.iota.jota.types.Trytes;
 
-public class MamRead {
+public class MamReadResponse extends MamResponse {
 
 	private Trytes payload;
 	
@@ -10,7 +10,7 @@ public class MamRead {
 	
 	private boolean isLast;
 
-	public MamRead(Trytes payload, int payloadSize, boolean isLast) {
+	public MamReadResponse(Trytes payload, int payloadSize, boolean isLast) {
 		this.payload = payload;
 		this.payloadSize = payloadSize;
 		this.isLast = isLast;

@@ -1,6 +1,6 @@
-package org.iota.jota.c.dto;
+package org.iota.jota.dto;
 
-public class ReturnSerialsedSize extends ReturnObject {
+public class MamReturnSerialisedSize extends MamResponse {
 
     private long size;
 

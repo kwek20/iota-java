@@ -30,13 +30,22 @@ mam_api_t api;
 
 void set_long_field(JNIEnv *env, jobject javaObj, char *package, char *field, size_t value){
   	jclass ent_clazz = (*env)->FindClass(env, package);
-	if (!ent_clazz) return;
+	if (!ent_clazz) {
+		return;
+	}
 	
 	jfieldID fid = (*env)->GetFieldID(env, ent_clazz, field, "J");
-	if (!fid) return;
+	if (!fid) {
+		return;
+	}
 	
 	// Set the long field
-	(*env)->SetObjectField(env, javaObj, fid, &value);
+	(*env)->SetLongField(env, javaObj, fid, value);
+	if ((*env)->ExceptionCheck(env) != JNI_FALSE) {
+		(*env)->ExceptionDescribe(env);
+	    (*env)->ExceptionClear(env);
+	    return;
+	}
 }
   
 void set_string_field(JNIEnv *env, jobject javaObj, char *package, char *field, char *text){
@@ -65,7 +74,6 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1serialized_1size
   (JNIEnv *env, jclass clazz, jobject returnObject){
   	size_t size =  mam_api_serialized_size(&api);
   	set_long_field(env, returnObject, "org/iota/jota/c/dto/ReturnSerialsedSize", "size", size);
-  	
   	return 0;
   }
 
@@ -74,13 +82,14 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1serialized_1size
  * Method:    mam_api_serialize
  * Signature: ([BLjava/lang/String;J)V
  */
-JNIEXPORT void JNICALL Java_org_iota_jota_c_MamC_mam_1api_1serialize
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1serialize
   (JNIEnv *env, jclass clazz, jbyteArray byteArray, jstring encryptionKey, jlong keySize){
   	size_t serialized_size = mam_api_serialized_size(&api);
 	trit_t *buffer = malloc(serialized_size * sizeof(trit_t));
 
    	const tryte_t *key = (tryte_t *) (*env)->GetStringUTFChars(env, encryptionKey, NULL);
-	return mam_api_serialize(&api, buffer, key, keySize);
+	mam_api_serialize(&api, buffer, key, keySize);
+	return  6;
   }
 
 /*
@@ -128,9 +137,8 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1load
  * Method:    mam_api_init
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1init
-  (JNIEnv *env, jclass clazz, jstring text){
-  	const char *inCStr = (*env)->GetStringUTFChars(env, text, NULL);
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1init(JNIEnv *env, jclass clazz, jstring seed){
+  	const char *inCStr = (*env)->GetStringUTFChars(env, seed, NULL);
   	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
   	
   	return mam_api_init(&api, trytes);

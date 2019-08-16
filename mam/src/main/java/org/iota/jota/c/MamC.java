@@ -8,9 +8,21 @@ import java.nio.file.Files;
 
 import org.iota.jota.Mam;
 import org.iota.jota.MamChecksum;
-import org.iota.jota.MamRead;
 import org.iota.jota.NarSystem;
-import org.iota.jota.c.dto.ReturnSerialsedSize;
+import org.iota.jota.dto.MamAnnounceChannelResponse;
+import org.iota.jota.dto.MamAnnoundeEndpointResponse;
+import org.iota.jota.dto.MamCreateChannelResponse;
+import org.iota.jota.dto.MamCreateEndpointResponse;
+import org.iota.jota.dto.MamReadResponse;
+import org.iota.jota.dto.MamRemainingChannelKeysResponse;
+import org.iota.jota.dto.MamRemainingEndpointKeysResponse;
+import org.iota.jota.dto.MamResponse;
+import org.iota.jota.dto.MamReturnSerialised;
+import org.iota.jota.dto.MamReturnSerialisedSize;
+import org.iota.jota.dto.MamWriteHeaderOnEndpointResponse;
+import org.iota.jota.dto.MamWritePacketToBundleResponse;
+import org.iota.jota.dto.MamWriteTagResponse;
+import org.iota.jota.dto.WriteHeaderOnChannelResponse;
 import org.iota.jota.model.Bundle;
 import org.iota.jota.types.Trytes;
 
@@ -20,106 +32,58 @@ public class MamC implements Mam {
     {
         NarSystem.loadLibrary();
     }
-    
-    // SECTION JNI WRAPPERS
-    
-    /*
-    typedef struct mam_api_s {
-      mam_prng_t prng;
-      mam_ntru_sk_t_set_t ntru_sks;
-      mam_ntru_pk_t_set_t ntru_pks;
-      mam_psk_t_set_t psks;
-      mam_channel_t_set_t channels;
-      trint18_t channel_ord;
-      trit_t_to_mam_msg_write_context_t_map_t write_ctxs;
-      trit_t_to_mam_msg_read_context_t_map_t read_ctxs;
-      mam_pk_t_set_t trusted_channel_pks;
-      mam_pk_t_set_t trusted_endpoint_pks;
-    } mam_api_t;
-     */
-    
-    // Sponge fixed key size
-    private static final int MAM_SPONGE_KEY_SIZE = 243;
-    
-    // Size of a Pre-Shared Key ID 
-    private static final int MAM_PSK_ID_SIZE = 81;
-    // Size of a Pre-Shared Key 
-    private static final int MAM_PSK_KEY_SIZE = 243;
-    
-    // NTRU id size
-    private static final int MAM_NTRU_ID_SIZE = 81;
-    // NTRU public key size
-    private static final int MAM_NTRU_PK_SIZE = 9216;
-    // NTRU secret key size
-    private static final int MAM_NTRU_SK_SIZE = 1024;
-    // NTRU session symmetric key size
-    private static final int MAM_NTRU_KEY_SIZE = MAM_SPONGE_KEY_SIZE;
-    // NTRU encrypted key size
-    private static final int MAM_NTRU_EKEY_SIZE = 9216;
-    
-    private class mam_psk_t {
-        // trit_t id[MAM_PSK_ID_SIZE];
-        byte[] id = new byte[MAM_PSK_ID_SIZE];
-        
-        // trit_t key[MAM_PSK_KEY_SIZE];
-        byte[] key = new byte[MAM_PSK_KEY_SIZE];
-      }
-    
-    private class mam_psk_t_set_entry_t {
-        mam_psk_t value;
-        
-        // UT_hash_handle
-        long hh;
-    }
-    
-    private class mam_ntru_pk_t {
-        // trit_t id[MAM_NTRU_ID_SIZE];
-        byte[] id = new byte[MAM_NTRU_ID_SIZE];
-        
-        // trit_t key[MAM_NTRU_KEY_SIZE];
-        byte[] key = new byte[MAM_NTRU_KEY_SIZE];
-      }
-    
-    private class mam_ntru_pk_t_set_entry_t {
-        mam_psk_t value;
-        
-        // UT_hash_handle
-        long hh;
-    }
 
-	// Wrapper classes> trit_t
-	
-	private static native long mam_api_serialized_size(ReturnSerialsedSize ret);
-	
+    // seed=tryte_t
+    private static native int mam_api_init(String seed);
+    
+    private static native int mam_api_destroy();
+    
+    private static native int mam_api_add_trusted_channel_pk(String pk);
+    private static native int mam_api_add_trusted_endpoint_pk(String pk);
+
+    private static native int mam_api_add_ntru_sk(mam_ntru_sk_t ntru_sk);
+    private static native int mam_api_add_ntru_pk(mam_ntru_pk_t ntru_pk);
+    private static native int mam_api_add_psk(mam_psk_t psk);
+    
+
+    // channel_id=tryte_t *const
+    private static native int mam_api_channel_create(long height, String channel_id);
+    private static native int mam_api_channel_remaining_sks(String channel_id);
+
+    
+    // channel_id=tryte_t *const
+    private static native int mam_api_endpoint_create(long height, String channel_id, String endpoint_id);
+    private static native int mam_api_endpoint_remaining_sks(String channel_id, String endpoint_id);
+    
+    private static native int mam_api_write_tag(MamWriteTagResponse ret, String message_id, int order);
+    
+    // ch_id=tryte_t const *const, bundle=bundle_transactions_t *const, msg_id=trit_t *const
+    // mam_psk_t_set_t -> mam_psk_t_set_entry_t -> mam_psk_t value && UT_hash_handle hh -> 
+    private static native int mam_api_bundle_write_header_on_channel(String ch_id, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle, byte[] msg_id);
+
+    private static native int mam_api_bundle_write_header_on_endpoint(String ch_id, String ep_id, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle, byte[] msg_id);
+    private static native int mam_api_bundle_announce_channel(String ch_id, String new_ch_id, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks);
+    private static native int mam_api_bundle_announce_endpoint(String ch_id, String new_ep_id, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks);
+    
+    private static native int mam_api_bundle_write_packet(byte[] msg_id, String payload, long payload_size, String checksum, boolean is_last_packet, Bundle bundle);
+
+    private static native int mam_api_bundle_read(Bundle bundle, String[] payload, long payload_size, boolean is_last_packet);
+    
+
+    private static native long mam_api_serialized_size(MamReturnSerialisedSize ret);
+    
 	// buffer=trit_t, encr_key_trytes=tryte_t
 	private static native void mam_api_serialize(byte[] buffer, String encr_key_trytes, long encr_key_trytes_size);
-	// buffer=trit_t, decr_key_trytes=tryte_t
+	
+	// buffer=trit_t, decr_key_trytes=tryte_tn
 	private static native int mam_api_deserialize(byte[] buffer, long buffer_size, String decr_key_trytes, long decr_key_trytes_size);
+	
 	// encr_key_trytes=tryte_t
 	private static native int mam_api_save(String filename, String encr_key_trytes, long encr_key_trytes_size);
+	
 	// decr_key_trytes=tryte_t
 	private static native int mam_api_load(String filename, String decr_key_trytes, long decr_key_trytes_size);
 	
-	// seed=tryte_t
-	private static native int mam_api_init(String seed);
-	
-	// channel_id=tryte_t *const
-	private static native int mam_api_channel_create(long height, String channel_id);
-	// channel_id=tryte_t *const
-	private static native int mam_api_endpoint_create(long height, String channel_id, String endpoint_id);
-	
-	// ch_id=tryte_t const *const, bundle=bundle_transactions_t *const, msg_id=trit_t *const
-	// mam_psk_t_set_t -> mam_psk_t_set_entry_t -> mam_psk_t value && UT_hash_handle hh -> 
-	private static native int mam_api_bundle_write_header_on_channel(String ch_id, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle, byte[] msg_id);
-	
-	private static native int mam_api_bundle_write_header_on_endpoint(String ch_id, String ep_id, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle, byte[] msg_id);
-	
-	private static native int mam_api_bundle_read(Bundle bundle, String[] payload, long payload_size, boolean is_last_packet);
-	
-	private static native int mam_api_bundle_write_packet(byte[] msg_id, String payload, long payload_size, String checksum, boolean is_last_packet, Bundle bundle);
-	
-	// SECTION END
-    
     public MamC(String location) {
         
     }
@@ -140,82 +104,152 @@ public class MamC implements Mam {
             System.load(nativeLibTmpFile.getAbsolutePath());
         }
     }
-	
-	
-	@Override
-	public void initApi(String seed) {
-	    mam_api_init(seed);
-	}
 
-	@Override
-	public void destroyApi() {
-		
-	}
+    @Override
+    public MamResponse initApi(String seed) {
+        mam_api_init(seed);
+        return null;
+    }
 
-	@Override
-	public void saveApi(String filename, Trytes encryptionKey, long keySize) {
-	    mam_api_save(filename, encryptionKey.getTrytesString(), keySize);
-	}
+    @Override
+    public MamResponse destroyApi() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void loadApi(String filename, Trytes decryptionKey, long keySize) {
-		mam_api_load(filename, decryptionKey.getTrytesString(), keySize);
-	}
+    @Override
+    public MamResponse addTrustedChannelPrivateKey(String pk) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public long serializedSize() {
-	    ReturnSerialsedSize sizeRet = new ReturnSerialsedSize();
-		return mam_api_serialized_size(sizeRet);
-	}
+    @Override
+    public MamResponse addTrustedEndpointPrivateKey(String pk) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public Trytes serialize(Trytes encryptionKey, long keySize) {
-		byte[] trit_t = new byte[0];
-		mam_api_serialize(trit_t, encryptionKey.getTrytesString(), keySize);
-		
-		return new Trytes(new String(trit_t));
-	}
+    @Override
+    public MamResponse addNTRUSecretKey(mam_ntru_sk_t ntru_sk) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void deserialize(Trytes encryptedApi, long encryptedSize, Trytes decryptionKey, long keySize) {
-		
-	}
+    @Override
+    public MamResponse addNTRUPublicKey(mam_ntru_pk_t ntru_pk) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public Trytes createChannel(int height) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public MamResponse addPreSharedKey(mam_psk_t psk) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public Trytes createEndpoint(int height, Trytes channelId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public MamCreateChannelResponse createChannel(int height) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public Trytes writeHeaderOnChannel(Trytes channelId, Bundle bundle) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public MamRemainingChannelKeysResponse getRemainingChannelSecretKeys(String channel_id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public Trytes writeHeaderOnEndpoint(Trytes channelId, Trytes endpointId, Bundle bundle) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public MamCreateEndpointResponse createEndpoint(int height, Trytes channelId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public void writePacketToBundle(Trytes messageId, Trytes payload, int payloadSize, MamChecksum checksum,
-			boolean isLast, Bundle bundle) {
-		// TODO Auto-generated method stub
+    @Override
+    public MamRemainingEndpointKeysResponse getRemainingEndpointSecretKeys(String channel_id, String endpoint_id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	}
+    @Override
+    public MamWriteTagResponse writeTag(String message_id, int order) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public MamRead readBundle(Bundle bundle) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public WriteHeaderOnChannelResponse writeHeaderOnChannel(String ch_id, mam_psk_t_set_entry_t[] psks,
+            mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle, byte[] msg_id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
+    @Override
+    public MamWriteHeaderOnEndpointResponse writeHeaderOnEndpoint(String ch_id, String ep_id,
+            mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle, byte[] msg_id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public MamAnnounceChannelResponse announceChannel(String ch_id, String new_ch_id, mam_psk_t_set_entry_t[] psks,
+            mam_ntru_pk_t_set_entry_t[] ntru_pks) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public MamAnnoundeEndpointResponse announceEndpoint(String ch_id, String new_ep_id, mam_psk_t_set_entry_t[] psks,
+            mam_ntru_pk_t_set_entry_t[] ntru_pks) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public MamWritePacketToBundleResponse writePacketToBundle(Trytes messageId, Trytes payload, int payloadSize,
+            MamChecksum checksum, boolean isLast, Bundle bundle) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public MamReadResponse readBundle(Bundle bundle) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public MamReturnSerialisedSize serializedSize() {
+        MamReturnSerialisedSize sizeRet = new MamReturnSerialisedSize();
+        mam_api_serialized_size(sizeRet);
+        //return sizeRet.getSize();
+        return null;
+    }
+
+    @Override
+    public MamReturnSerialised serialize(Trytes encryptionKey, long keySize) {
+        byte[] trit_t = new byte[0];
+        mam_api_serialize(trit_t, encryptionKey.getTrytesString(), keySize);
+        
+        //return new Trytes(new String(trit_t));
+        return null;
+    }
+
+    @Override
+    public MamResponse deserialize(Trytes encryptedApi, long encryptedSize, Trytes decryptionKey, long keySize) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public MamResponse saveApi(String fileName, Trytes encryptionKey, long keySize) {
+        mam_api_save(fileName, encryptionKey.getTrytesString(), keySize);
+        return null;
+    }
+
+    @Override
+    public MamResponse loadApi(String fileName, Trytes decryptionKey, long keySize) {
+        mam_api_load(fileName, decryptionKey.getTrytesString(), keySize);
+        return null;
+    }
 }

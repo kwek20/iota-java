@@ -1,6 +1,6 @@
-package org.iota.jota.c.dto;
+package org.iota.jota.dto;
 
-public abstract class ReturnObject {
+public abstract class MamResponse {
 
     long returnValue = -1;
     
