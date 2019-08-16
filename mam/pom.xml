@@ -28,6 +28,17 @@
 
     
     <build>
+    	<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<!--  <excludes>
+					<exclude>**/*.md</exclude>
+					<exclude>**/*.h</exclude>
+					<exclude>**/*.lib</exclude>
+				</excludes>-->
+			</resource>
+		</resources>
+    
         <plugins>
             <plugin>
                 <groupId>com.github.maven-nar</groupId>
@@ -42,11 +53,33 @@
                         </library>
                     </libraries>
                     
+                    <c>
+					    <includePaths>
+					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/com_github_uthash/_virtual_includes/uthash</includePath>
+					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/keccak/_virtual_includes/keccak_sponge_common</includePath>
+					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/keccak/_virtual_includes/keccak_sponge_1600</includePath>
+					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/keccak/_virtual_includes/common</includePath>
+					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/keccak/_virtual_includes/snp_1600_reference</includePath>
+					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/keccak/_virtual_includes/keccak</includePath>
+					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-entangled</includePath>
+					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin</includePath>
+					    </includePaths>
+				  	</c>
+                    
                     <linker>
-                    	<libSet>
-                    	
-                    	</libSet>
-                    </linker>
+					    <libs>
+					      	<lib>
+					        	<name>keccak</name>
+					        	<type>shared</type>
+					        	<directory>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/keccak</directory>
+					      	</lib>
+					      	<lib>
+					        	<name>mam</name>
+					        	<type>shared</type>
+					        	<directory>/home/brord/Desktop/Work/IOTA/Git/iota-java/mam/src/nar/resources/aol/amd64-Linux-gpp</directory>
+					      	</lib>
+					    </libs>
+			  		</linker>
                 </configuration>
             </plugin>
 			

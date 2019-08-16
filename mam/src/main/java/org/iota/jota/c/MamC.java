@@ -10,6 +10,7 @@ import org.iota.jota.Mam;
 import org.iota.jota.MamChecksum;
 import org.iota.jota.MamRead;
 import org.iota.jota.NarSystem;
+import org.iota.jota.c.dto.ReturnSerialsedSize;
 import org.iota.jota.model.Bundle;
 import org.iota.jota.types.Trytes;
 
@@ -88,7 +89,7 @@ public class MamC implements Mam {
 
 	// Wrapper classes> trit_t
 	
-	private static native long mam_api_serialized_size();
+	private static native long mam_api_serialized_size(ReturnSerialsedSize ret);
 	
 	// buffer=trit_t, encr_key_trytes=tryte_t
 	private static native void mam_api_serialize(byte[] buffer, String encr_key_trytes, long encr_key_trytes_size);
@@ -163,7 +164,8 @@ public class MamC implements Mam {
 
 	@Override
 	public long serializedSize() {
-		return mam_api_serialized_size();
+	    ReturnSerialsedSize sizeRet = new ReturnSerialsedSize();
+		return mam_api_serialized_size(sizeRet);
 	}
 
 	@Override
