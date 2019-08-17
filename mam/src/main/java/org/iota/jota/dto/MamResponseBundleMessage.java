@@ -5,9 +5,10 @@ import org.iota.jota.types.Trits;
 
 public abstract class MamResponseBundleMessage extends MamResponse {
 
-private Bundle bundle;
+    private Bundle bundle;
     
-    private byte[] tritsId;
+    // TODO make bytes
+    private int[] tritsId;
     private Trits messageId;
     
     /**
@@ -21,6 +22,10 @@ private Bundle bundle;
      * @return the messageId
      */
     public Trits getMessageId() {
-        return messageId;
+        if (null != messageId) {
+            return messageId;
+        }
+        
+        return messageId = new Trits(tritsId);
     }
 }
