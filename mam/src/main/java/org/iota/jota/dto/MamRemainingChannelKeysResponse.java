@@ -2,8 +2,17 @@ package org.iota.jota.dto;
 
 public class MamRemainingChannelKeysResponse extends MamResponse {
 
+    private long numChannelKeys;
+    
     public MamRemainingChannelKeysResponse() {
-        // TODO Auto-generated constructor stub
+        
+    }
+    
+    public long getNumChannelKeys() {
+        return numChannelKeys;
     }
 
+    public void setNumChannelKeys(long numChannelKeys) {
+        this.numChannelKeys = numChannelKeys;
+    }
 }

@@ -1,20 +1,21 @@
 package org.iota.jota;
 
 import org.iota.jota.dto.MamAnnounceChannelResponse;
-import org.iota.jota.dto.MamAnnoundeEndpointResponse;
+import org.iota.jota.dto.MamAnnounceEndpointResponse;
 import org.iota.jota.dto.MamCreateChannelResponse;
 import org.iota.jota.dto.MamCreateEndpointResponse;
-import org.iota.jota.dto.MamReadResponse;
+import org.iota.jota.dto.MamReadBundleResponse;
 import org.iota.jota.dto.MamRemainingChannelKeysResponse;
 import org.iota.jota.dto.MamRemainingEndpointKeysResponse;
 import org.iota.jota.dto.MamResponse;
 import org.iota.jota.dto.MamReturnSerialised;
 import org.iota.jota.dto.MamReturnSerialisedSize;
+import org.iota.jota.dto.MamWriteHeaderOnChannelResponse;
 import org.iota.jota.dto.MamWriteHeaderOnEndpointResponse;
 import org.iota.jota.dto.MamWritePacketToBundleResponse;
 import org.iota.jota.dto.MamWriteTagResponse;
-import org.iota.jota.dto.WriteHeaderOnChannelResponse;
 import org.iota.jota.model.Bundle;
+import org.iota.jota.types.Trits;
 import org.iota.jota.types.Trytes;
 
 public interface Mam {
@@ -142,87 +143,87 @@ public interface Mam {
      * Creates and adds a channel to the API
      *
      * @param   height      The channel's MSS height
-     * @return a status code
+     * @return a status code and channel ID
      */
 	MamCreateChannelResponse createChannel(int height);
     
 	/**
 	 * Returns the number of remaining secret keys of a channel
 	 *
-	 * @param channel_id  The channel id
+	 * @param channelId  The channel id
 	 * @return the number of remaining secret keys of the channel
 	 */
-	MamRemainingChannelKeysResponse getRemainingChannelSecretKeys(String channel_id);
+	MamRemainingChannelKeysResponse getRemainingChannelSecretKeys(String channelId);
     
     /**
      * Creates and adds an endpoint to the API
      *
      * @param   height      The endpoint's MSS height
      * @param   channel_id  The parent channel id
-     * @return a status code
+     * @return a status code and endpoint ID
      */
 	MamCreateEndpointResponse createEndpoint(int height, Trytes channelId);
 	
 	/**
 	 * Returns the number of remaining secret keys of an endpoint
 	 *
-	 * @param channel_id  The parent channel id
-	 * @param endpoint_id The endpoint id
+	 * @param channelId  The parent channel id
+	 * @param endpointId The endpoint id
 	 * @return the number of remaining secret keys of the endpoint
 	 */
-	MamRemainingEndpointKeysResponse getRemainingEndpointSecretKeys(String channel_id, String endpoint_id);
+	MamRemainingEndpointKeysResponse getRemainingEndpointSecretKeys(String channelId, String endpointId);
 
 	/**
 	 * Creates a MAM tag that can be used in IOTA transactions
 	 *
-	 * @param msg_id  The message ID
-	 * @param ord     The packet ord
-	 * @return
+	 * @param messageId  The message ID
+	 * @param order      The packet order
+	 * @return the tag
 	 */
-	MamWriteTagResponse writeTag(String message_id, int order);
+	MamWriteTagResponse writeTag(Trits messageId, int order);
     
 	/**
 	 * Writes a MAM header through a channel into a bundle
 	 *
-	 * @param ch_id     The channel ID
+	 * @param channelId The channel ID
 	 * @param psks      Pre-Shared Keys used for encrypting the session key
 	 * @param ntru_pks  NTRU public keys used for encrypting the session key
-	 * @return a status code
+	 * @return a status code, the bundle and message ID
 	 */
-	WriteHeaderOnChannelResponse writeHeaderOnChannel(String ch_id, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle, byte[] msg_id);
+	MamWriteHeaderOnChannelResponse writeHeaderOnChannel(String channelId, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks);
 
 	/**
 	 * Writes a MAM header through an endpoint into a bundle
 	 *
-	 * @param ch_id     The parent channel ID
-	 * @param ep_id     The endpoint ID
-	 * @param psks      Pre-Shared Keys used for encrypting the session key
-	 * @param ntru_pks  NTRU public keys used for encrypting the session key
-	 * @return a status code
+	 * @param channelId    The parent channel ID
+	 * @param endpointId   The endpoint ID
+	 * @param psks         Pre-Shared Keys used for encrypting the session key
+	 * @param ntru_pks     NTRU public keys used for encrypting the session key
+	 * @return a status code, the bundle and message ID
 	 */
-    MamWriteHeaderOnEndpointResponse writeHeaderOnEndpoint(String ch_id, String ep_id, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle, byte[] msg_id);
+    MamWriteHeaderOnEndpointResponse writeHeaderOnEndpoint(String channelId, String endpointId, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks);
     
     /**
      * Writes an announcement of a channel into a bundle
      *
-     * @param ch_id     The channel ID
-     * @param ch1_id    The new channel ID
-     * @param psks      Pre-Shared Keys used for encrypting the session key
-     * @param ntru_pks  NTRU public keys used for encrypting the session key
-     * @return a status code
+     * @param channelId     The channel ID
+     * @param newChannelId  The new channel ID
+     * @param psks          Pre-Shared Keys used for encrypting the session key
+     * @param ntru_pks      NTRU public keys used for encrypting the session key
+     * @return a status code, the bundle and message ID
      */
-    MamAnnounceChannelResponse announceChannel(String ch_id, String new_ch_id, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks);
+    MamAnnounceChannelResponse announceChannel(String channelId, String newChannelId, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks);
 
     /**
      * Writes an announcement of a endpoint into a bundle
      *
-     * @param ch_id     The channel ID
-     * @param ep1_id    The new endpoint ID
-     * @param psks      Pre-Shared Keys used for encrypting the session key
-     * @param ntru_pks  NTRU public keys used for encrypting the session key
-     * @return a status code
+     * @param channelId     The channel ID
+     * @param newEndpointId The new endpoint ID
+     * @param psks          Pre-Shared Keys used for encrypting the session key
+     * @param ntru_pks      NTRU public keys used for encrypting the session key
+     * @return a status code, the bundle and message ID
      */
-    MamAnnoundeEndpointResponse announceEndpoint(String ch_id, String new_ep_id, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks);
+    MamAnnounceEndpointResponse announceEndpoint(String channelId, String newEndpointId, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks);
     
     /**
      * Writes a MAM packet into a bundle
@@ -231,22 +232,22 @@ public interface Mam {
      * @param payload         Payload to write into the packet
      * @param payload size    The payload size
      * @param is_last_packet  Indicates whether or not this is the last packet
-     * @return a status code
+     * @return a status code and the bundle we wrote to
      */
-	MamWritePacketToBundleResponse writePacketToBundle(Trytes messageId, Trytes payload, int payloadSize, MamChecksum checksum, boolean isLast, Bundle bundle);
+	MamWritePacketToBundleResponse writePacketToBundle(Trytes messageId, Trytes payload, long payloadSize, MamChecksum checksum, boolean isLast, Bundle bundle);
 	
 	/**
 	 * Reads a MAM header and potentially a MAM packet from a bundle
 	 *
 	 * @param bundle          The bundle containing the MAM message
-	 * @return a status code
+	 * @return a status code, payload, payload size and a boolean indicating last packet or not
 	 */
-	MamReadResponse readBundle(Bundle bundle);
+	MamReadBundleResponse readBundle(Bundle bundle);
 	
 	/**
 	 * Gets the number of trits needed to serialize an API
 	 *
-	 * @return return the size
+	 * @return return the size of the api after serializing
 	 */
     MamReturnSerialisedSize serializedSize();
     
@@ -256,20 +257,20 @@ public interface Mam {
      * @param api                   The API
      * @param encr_key_trytes       The encryption key (optional - can be set to null)
      * @param encr_key_trytes_size  The encryption key size
-     * @return return void
+     * @return return The serialized api trits
      */
     MamReturnSerialised serialize(Trytes encryptionKey, long keySize);
     
     /**
-     * Deserializes a buffer into an API
+     * Deserializes a buffer into an API, and loads this
      *
-     * @param buffer                The buffer from where to deserialize
-     * @param buffer_size           The size of the buffer
-     * @param decr_key_trytes       The decryption key (optional - can be set to null)
-     * @param decr_key_trytes_size  The decryption key size
+     * @param encryptedApi          The buffer from where to deserialize api trits from
+     * @param encryptedSize         The size of the buffer in trits
+     * @param decryptionKey         The decryption key (optional - can be set to null)
+     * @param keySize               The decryption key size
      * @return a status code
      */
-    MamResponse deserialize(Trytes encryptedApi, long encryptedSize, Trytes decryptionKey, long keySize);
+    MamResponse deserialize(Trits encryptedApi, long encryptedSize, Trytes decryptionKey, long keySize);
     
     /**
      * Saves the API into a file

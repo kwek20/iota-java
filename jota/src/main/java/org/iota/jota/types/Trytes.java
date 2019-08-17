@@ -2,6 +2,7 @@ package org.iota.jota.types;
 
 import org.iota.jota.error.ArgumentException;
 import org.iota.jota.utils.Constants;
+import org.iota.jota.utils.Converter;
 import org.iota.jota.utils.InputValidator;
 
 public class Trytes {
@@ -18,6 +19,10 @@ public class Trytes {
     
     public String getTrytesString() {
         return trytesString;
+    }
+    
+    public int[] toTrits() {
+        return Converter.trits(trytesString);
     }
 
     @Override

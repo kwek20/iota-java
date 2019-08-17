@@ -5,14 +5,14 @@ public enum MamChecksum {
 	/**
 	 * Well.. none!
 	 */
-	NONE, 
+	NONE(0), 
 	
 	/**
 	 * With MAC checksum you add integrity to your packet. 
 	 * Due to the underlying sponge construction of a MAM message, a MAC checksum actually also adds integrity to all previous packets of the message. 
 	 * Adding a MAC checksum to a packet is a really cheap operation so it is recommended in most cases.
 	 */
-	MAC, 
+	MAC(1), 
 	
 	/**
 	 * With signature (chosen method in the example) you add integrity and authenticity to your packet. 
@@ -20,5 +20,15 @@ public enum MamChecksum {
 	 * For the same reasons, by signing a packet you add authenticity to all previous packets of the message. 
 	 * Signing a packet is an expensive operation, depending on your use case you could for example sign one packet out of ten.
 	 */
-	SIG
+	SIG(2);
+    
+    private int num;
+
+    private MamChecksum(int num) {
+        this.num = num;
+    }
+    
+    public int getNum() {
+        return num;
+    }
 }
