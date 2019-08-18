@@ -5,6 +5,7 @@ import org.iota.jota.types.Trytes;
 public class MamCreateChannelResponse extends MamResponse {
     
     private Trytes channelId;
+    private String channel_id;
 
     public MamCreateChannelResponse() {
         

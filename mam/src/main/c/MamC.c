@@ -57,6 +57,7 @@ void set_string_field(JNIEnv *env, jobject javaObj, char *package, char *field, 
 	
 	jstring jstr = (*env)->NewStringUTF(env, text);
 	if (!jstr || (*env)->ExceptionCheck(env) != JNI_FALSE) {
+	    (*env)->ExceptionDescribe(env);
 	    (*env)->ExceptionClear(env);
 	    return;
 	}
@@ -64,6 +65,152 @@ void set_string_field(JNIEnv *env, jobject javaObj, char *package, char *field, 
 	// Set the String field
 	(*env)->SetObjectField(env, javaObj, fid, jstr);
 }
+
+/*
+ * Class:     org_iota_jota_c_MamC
+ * Method:    mam_api_init
+ * Signature: (Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1init(JNIEnv *env, jclass clazz, jstring seed){
+  	const char *inCStr = (*env)->GetStringUTFChars(env, seed, NULL);
+  	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
+  	
+  	return mam_api_init(&api, trytes);
+}
+
+/*
+ * Class:     org_iota_jota_c_MamC
+ * Method:    mam_api_destroy
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1destroy(JNIEnv *env, jclass clazz){
+  	return mam_api_destroy(&api);
+}
+
+/*
+ * Method:    mam_api_add_trusted_channel_pk
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1trusted_1channel_pk(JNIEnv *env, jclass clazz, jstring pk){
+  	const char *inCStr = (*env)->GetStringUTFChars(env, pk, NULL);
+  	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
+  	
+  	size_t code = mam_api_add_trusted_channel_pk(&api, trytes);
+  	
+  	return code;
+}
+
+/*
+ * Method:    mam_api_add_trusted_endpoint_pk
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1trusted_1endpoint_1pk(JNIEnv *env, jclass clazz, jstring pk){
+  	const char *inCStr = (*env)->GetStringUTFChars(env, pk, NULL);
+  	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
+  	
+  	size_t code = mam_api_add_trusted_endpoint_pk(&api, trytes);
+  	return code;
+}
+
+/*
+ * Method:    mam_api_add_ntru_sk
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1ntru_1sk(JNIEnv *env, jclass clazz, jclass ntru_sk){
+  	
+  	size_t code = mam_api_add_ntru_sk(&api, ntru_sk);
+  	return code;
+}
+
+/*
+ * Method:    mam_api_add_ntru_pk
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1ntru_1pk(JNIEnv *env, jclass clazz, jclass ntru_pk){
+  	
+  	size_t code = mam_api_add_ntru_pk(&api, ntru_pk);
+  	return code;
+}
+
+/*
+ * Method:    mam_api_add_psk
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1psk(JNIEnv *env, jclass clazz, jclass psk){
+  	const char *inCStr = (*env)->GetStringUTFChars(env, psk, NULL);
+  	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
+  	
+  	size_t code = mam_api_add_psk(&api, psk);
+  	return code;
+}
+
+/*
+ * Class:     org_iota_jota_c_MamC
+ * Method:    mam_api_channel_create
+ * Signature: (JLjava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1channel_1create
+  (JNIEnv *env, jclass clazz, jlong height, jstring channelId){
+  	tryte_t channel_id[MAM_CHANNEL_ID_TRYTE_SIZE];
+  	
+  	retcode_t code = mam_api_channel_create(&api, height, channel_id);
+  	set_string_field(env, returnObject, "org/iota/jota/c/dto/MamCreateChannelResponse", "channel_id", channel_id);
+	return code;
+}
+
+/*
+ * Class:     org_iota_jota_c_MamC
+ * Method:    mam_api_channel_remaining_sks
+ * Signature: (Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1channel_1remaining_1sks(JNIEnv *env, jclass clazz, jstring endpoint_id){
+  	const char *inCStr = (*env)->GetStringUTFChars(env, endpoint_id, NULL);
+  	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
+  	
+  	return mam_api_channel_remaining_sks(&api, trytes);
+}
+
+/*
+ * Class:     org_iota_jota_c_MamC
+ * Method:    mam_api_endpoint_create
+ * Signature: (JLjava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1endpoint_1create
+  (JNIEnv *env, jclass clazz, jlong height, jstring channelId, jstring endpointId){
+  	const tryte_t *channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, channelId, NULL);
+  	
+	// Out
+  	tryte_t endpoint_id[MAM_ENDPOINT_ID_TRYTE_SIZE];
+  	
+	retcode_t code = mam_api_endpoint_create(&api, height, channel_id, endpoint_id);
+	set_string_field(env, returnObject, "org/iota/jota/c/dto/MamCreateEndpointResponse", "endpoint_id", endpoint_id);
+	return code;
+}
+  
+/*
+ * Class:     org_iota_jota_c_MamC
+ * Method:    mam_api_endpoint_remaining_sks
+ * Signature: (Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1endpoint_1remaining_1sks(JNIEnv *env, jclass clazz, jstring endpoint_id){
+  	const char *inCStr = (*env)->GetStringUTFChars(env, endpoint_id, NULL);
+  	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
+  	
+  	return mam_api_endpoint_remaining_sks(&api, trytes);
+}
+
+/*
+ * Method:    mam_api_write_tag
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1write_1tag(JNIEnv *env, jclass clazz, trit_t const *const msg_id, trint18_t const ord){
+	//TODO: Tag size is wrong
+	
+	trit_t tag[MAM_ENDPOINT_ID_TRYTE_SIZE];
+	mam_api_write_tag(tag, msg_id, ord);
+	
+	return 0;
+}
+
+/*
+###############################################################
+*/
+
+
 
 /*
  * Class:     org_iota_jota_c_MamC
@@ -142,33 +289,6 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1init(JNIEnv *env, jcl
   	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
   	
   	return mam_api_init(&api, trytes);
-  }
-
-/*
- * Class:     org_iota_jota_c_MamC
- * Method:    mam_api_channel_create
- * Signature: (JLjava/lang/String;)I
- */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1channel_1create
-  (JNIEnv *env, jclass clazz, jlong height, jstring channelId){
-  	tryte_t channel_id[MAM_CHANNEL_ID_TRYTE_SIZE];
-  	
-  	return mam_api_channel_create(&api, height, channel_id);
-  }
-
-/*
- * Class:     org_iota_jota_c_MamC
- * Method:    mam_api_endpoint_create
- * Signature: (JLjava/lang/String;Ljava/lang/String;)I
- */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1endpoint_1create
-  (JNIEnv *env, jclass clazz, jlong height, jstring channelId, jstring endpointId){
-  	const tryte_t *channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, channelId, NULL);
-  	
-	// Out
-  	tryte_t endpoint_id[MAM_ENDPOINT_ID_TRYTE_SIZE];
-  	
-	return mam_api_endpoint_create(&api, height, channel_id, endpoint_id);
   }
 
 /*
