@@ -28,6 +28,26 @@ extern "C" {
 
 mam_api_t api;
 
+void set_bool_field(JNIEnv *env, jobject javaObj, char *package, char *field, bool value){
+	jclass ent_clazz = (*env)->FindClass(env, package);
+	if (!ent_clazz) {
+		return;
+	}
+	
+	jfieldID fid = (*env)->GetFieldID(env, ent_clazz, field, "Z");
+	if (!fid) {
+		return;
+	}
+	
+	// Set the bool field
+	(*env)->SetBooleanField(env, javaObj, fid, value);
+	if ((*env)->ExceptionCheck(env) != JNI_FALSE) {
+		(*env)->ExceptionDescribe(env);
+	    (*env)->ExceptionClear(env);
+	    return;
+	}
+}
+
 void set_long_field(JNIEnv *env, jobject javaObj, char *package, char *field, size_t value){
   	jclass ent_clazz = (*env)->FindClass(env, package);
 	if (!ent_clazz) {
@@ -47,7 +67,24 @@ void set_long_field(JNIEnv *env, jobject javaObj, char *package, char *field, si
 	    return;
 	}
 }
-  
+
+void call_string_setter(JNIEnv *env, jobject javaObj, char *package, char *method, char *text){
+  	jclass ent_clazz = (*env)->FindClass(env, package);
+	if (!ent_clazz) return;
+	
+	jmethodID mid = env->GetMethodID( ent_clazz, method, "([java/lang/String;)V");
+	if (!mid) return;
+	
+	jstring jstr = (*env)->NewStringUTF(env, text);
+	if (!jstr || (*env)->ExceptionCheck(env) != JNI_FALSE) {
+	    (*env)->ExceptionDescribe(env);
+	    (*env)->ExceptionClear(env);
+	    return;
+	}
+	
+	(*env)->CallVoidMethod(env, javaObj, mid, jstr);
+}
+
 void set_string_field(JNIEnv *env, jobject javaObj, char *package, char *field, char *text){
   	jclass ent_clazz = (*env)->FindClass(env, package);
 	if (!ent_clazz) return;
@@ -222,64 +259,119 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1write_1tag(JNIEnv *en
 
 
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_bundle_write_header_on_channel
- * Signature: (Ljava/lang/String;[Lorg/iota/jota/c/MamC/mam_psk_t_set_entry_t;[Lorg/iota/jota/c/MamC/mam_ntru_pk_t_set_entry_t;Lorg/iota/jota/model/Bundle;[B)I
  */
 JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1header_1on_1channel
-  (JNIEnv *env, jclass clazz, jstring channelId, jobject psks, jobject ntru_pks, jobject bundle, jbyteArray msgId){
+  (JNIEnv *env, jclass clazz, jobject response, jstring ch_id, jobjectArray psks, jobjectArray ntru_pks){
   	
-  	/*const tryte_t *channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, channelId, NULL);
+  	const tryte_t *channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, ch_id, NULL);
   	
   	bundle_transactions_t *bundle = NULL;
-	trit_t message_id[MAM_MSG_ID_SIZE];
-	
 	bundle_transactions_new(&bundle);
 	
-	return mam_api_bundle_write_header_on_channel(&api, channel_id, NULL, NULL, bundle, message_id);*/
-	return 5;
+	trit_t message_id[MAM_MSG_ID_SIZE];
+	
+	retcode_t code = mam_api_bundle_write_header_on_channel(&api, channel_id, NULL, NULL, bundle, message_id);
+	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamResponseBundleMessage", "setMessageId", message_id);
+	return code;
 }
 
 
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_bundle_write_header_on_endpoint
- * Signature: (Ljava/lang/String;Ljava/lang/String;[Lorg/iota/jota/c/MamC/mam_psk_t_set_entry_t;[Lorg/iota/jota/c/MamC/mam_ntru_pk_t_set_entry_t;Lorg/iota/jota/model/Bundle;[B)I
  */
 JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1header_1on_1endpoint
-  (JNIEnv *env, jclass clazz, jstring text1, jstring text2, jobject javaObjArray1, jobject javaObjArray2, jobject obj, jbyteArray byteArray){
-  	return 5;
-  }
-  
-mam_api_bundle_announce_channel
+  (JNIEnv *env, jclass clazz, jobject response, jstring ch_id, jstring ep_id, jobjectArray psks, jobjectArray ntru_pks, jobject obj, jbyteArray byteArray){
+  	const tryte_t *channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, ch_id, NULL);
+  	const tryte_t *endpoint_id = (tryte_t *) (*env)->GetStringUTFChars(env, ep_id, NULL);
   	
-mam_api_bundle_announce_endpoint
+  	bundle_transactions_t *bundle = NULL;
+  	bundle_transactions_new(&bundle);
+  	
+	trit_t message_id[MAM_MSG_ID_SIZE];
+	
+	retcode_t code = mam_api_bundle_write_header_on_endpoint(&api, channel_id, endpoint_id, NULL, NULL, bundle, message_id);
+	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamResponseBundleMessage", "setMessageId", message_id);
+	return code;
+}
 
 /*
- * Class:     org_iota_jota_c_MamC
+ * Method:    mam_api_bundle_announce_channel
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1announce_1channel
+	(JNIEnv *env, jclass clazz, jobject response, jstring ch_id, jstring new_ch_id, jobject psks, jobject ntru_pks){
+	const tryte_t *channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, ch_id, NULL);
+  	const tryte_t *new_channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, new_ch_id, NULL);
+  	
+  	bundle_transactions_t *bundle = NULL;
+  	bundle_transactions_new(&bundle);
+  	
+	trit_t message_id[MAM_MSG_ID_SIZE];
+	
+	retcode_t code = mam_api_bundle_announce_channel(&api, channel_id, endpoint_id, NULL, NULL, bundle, message_id);
+	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamResponseBundleMessage", "setMessageId", message_id);
+	return code;
+}
+
+/*
+ * Method:    mam_api_bundle_announce_endpoint
+ */
+JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1announce_1endpoint
+	(JNIEnv *env, jclass clazz, jobject response, jstring ch_id, jstring new_ep_id, jobject psks, jobject ntru_pks){
+	const tryte_t *channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, ch_id, NULL);
+  	const tryte_t *new_endpoint_id = (tryte_t *) (*env)->GetStringUTFChars(env, new_ep_id, NULL);
+  	
+  	bundle_transactions_t *bundle = NULL;
+  	bundle_transactions_new(&bundle);
+  	
+	trit_t message_id[MAM_MSG_ID_SIZE];
+	
+	retcode_t code = mam_api_bundle_announce_endpoint(&api, channel_id, endpoint_id, NULL, NULL, bundle, message_id);
+	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamResponseBundleMessage", "setMessageId", message_id);
+	return code;
+}
+
+/*
  * Method:    mam_api_bundle_write_packet
- * Signature: ([BLjava/lang/String;JLjava/lang/String;ZLorg/iota/jota/model/Bundle;)I
  */
 JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1packet
-  (JNIEnv *env, jclass clazz, jbyteArray byteArray, jstring text1, jlong longValue, jstring text2, jboolean boolValue, jobject obj){
-  	return 5;
+  (JNIEnv *env, jclass clazz, jobject response, jintArray msg_id, jstring payload, jlong payload_size, jint checksum_int, jboolean is_last){
+  	mam_msg_checksum_t checksum = (mam_msg_checksum_t) checksum_int;
+  	const tryte_t *write_payload = (tryte_t *) (*env)->GetStringUTFChars(env, payload, NULL);
+  	
+  	jsize len = (*env)->GetArrayLength(env, msg_id);
+  	jintArray message_id = (*env)->NewIntArray(env, len);
+    (*env)->SetIntArrayRegion(env, message_id, 0, len, msg_id);
+  	
+  	bundle_transactions_t *bundle = NULL;
+  	bundle_transactions_new(&bundle);
+  	
+  	retcode_t code = mam_api_bundle_write_packet(&api, message_id, write_payload, (int) payload_size, checksum, (bool) is_last, bundle);
+  	return code;
 }
   
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_bundle_read
- * Signature: (Lorg/iota/jota/model/Bundle;[Ljava/lang/String;JZ)I
  */
 JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1read
-  (JNIEnv *env, jclass clazz, jobject obj, jobject javaObjArray, jlong longValue, jboolean boolValue){
-  	return 5;
+  (JNIEnv *env, jclass clazz, jobject response, jobject bundle){
+  
+  	tryte_t *payload = NULL;
+	size_t payload_size = 0;
+	bool is_last_packet = false;
+	
+	retcode_t code = mam_api_bundle_read(&api, bundle, &payload, &payload_size, &is_last_packet);
+	
+  	set_long_field(env, returnObject, "org/iota/jota/c/dto/MamReadBundleResponse", "payloadSize", payload_size);
+	call_string_setter(env, returnObject, "org/iota/jota/c/dto/MamReadBundleResponse", "setPayload", (char *)payload);
+	set_bool_field(env, returnObject, "org/iota/jota/c/dto/MamReadBundleResponse", "isLast", is_last_packet);
+	free(payload);
+  	return code;
 }
 
 
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_serialized_size
- * Signature: ()J
  */
 JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1serialized_1size
   (JNIEnv *env, jclass clazz, jobject returnObject){
@@ -289,9 +381,7 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1serialized_1size
 }
 
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_serialize
- * Signature: ([BLjava/lang/String;J)V
  */
 JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1serialize
   (JNIEnv *env, jclass clazz, jbyteArray byteArray, jstring encryptionKey, jlong keySize){
@@ -304,9 +394,7 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1serialize
   }
 
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_deserialize
- * Signature: ([BJLjava/lang/String;J)I
  */
 JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1deserialize
   (JNIEnv *env, jclass clazz, jbyteArray buffer, jlong serialized_size, jstring encryptionKey, jlong keySize){
@@ -318,9 +406,7 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1deserialize
   }
 
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_save
- * Signature: (Ljava/lang/String;Ljava/lang/String;J)I
  */
 JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1save
   (JNIEnv *env, jclass clazz, jstring fileName, jstring encryptionKey, jlong keySize){
@@ -331,9 +417,7 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1save
   }
 
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_load
- * Signature: (Ljava/lang/String;Ljava/lang/String;J)I
  */
 JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1load
   (JNIEnv *env, jclass clazz, jstring fileName, jstring encryptionKey, jlong keySize){

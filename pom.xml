@@ -103,10 +103,7 @@
         <dependency-check-maven.version>5.0.0-M3</dependency-check-maven.version>
     </properties>
 
-    <modules>
-        <module>jota</module>
-        <module>jota-mam</module>
-    </modules>
+    
 
     <repositories>
         <repository>

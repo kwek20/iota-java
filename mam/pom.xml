@@ -13,11 +13,17 @@
 	<packaging>nar</packaging>
 
     <dependencies>
-    	<dependency>
+    	<!-- <dependency>
     		<groupId>org.iota</groupId>
     		<artifactId>jota</artifactId>
     		<version>1.0.0-beta5</version>
-    	</dependency>
+    	</dependency> -->
+
+		<dependency>
+		    <groupId>com.github.kwek20</groupId>
+		    <artifactId>iota-java</artifactId>
+		    <version>mam-v2-SNAPSHOT</version>
+		</dependency>
 
 	    <dependency>
 	      <groupId>org.scijava</groupId>

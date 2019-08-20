@@ -65,9 +65,18 @@ public interface Mam {
     class mam_psk_t_set_entry_t {
         mam_psk_t value;
         
-        // UT_hash_handle
+        // UT_hash_handle -> store key and use for lookup in C structs
         long hh;
     }
+    
+    class mam_ntru_pk_t_set_entry_t {
+        mam_psk_t value;
+        
+        // UT_hash_handle -> store key and use for lookup in C structs
+        long hh;
+    }
+    
+
     
     class mam_ntru_pk_t {
         // trit_t id[MAM_NTRU_ID_SIZE];
@@ -77,22 +86,17 @@ public interface Mam {
         byte[] key = new byte[MAM_NTRU_KEY_SIZE];
       }
     
-    class mam_ntru_pk_t_set_entry_t {
-        mam_psk_t value;
-        
-        // UT_hash_handle
-        long hh;
-    }
-    
-    // Associated public key
     class mam_ntru_sk_t {
+
+        // Associated public key
         mam_ntru_pk_t public_key;
         
-        // Secret key - small coefficients of polynomial f
+        // trit_t -> Secret key - small coefficients of polynomial f
         byte[] secret_key = new byte[MAM_NTRU_SK_SIZE];
         
         // Internal representation of a private key: NTT(1+3f) poly_t
-        Object f;
+        // type poly_t Trint9 -> Trint9 int16 -> short
+        short f;
     }
     
     /**

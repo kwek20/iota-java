@@ -1,15 +1,14 @@
 package org.iota.jota.dto;
 
 import org.iota.jota.model.Bundle;
-import org.iota.jota.types.Trits;
+import org.iota.jota.types.Trytes;
+import org.iota.jota.utils.Converter;
 
 public abstract class MamResponseBundleMessage extends MamResponse {
 
     private Bundle bundle;
     
-    // TODO make bytes
-    private int[] tritsId;
-    private Trits messageId;
+    private Trytes messageId;
     
     /**
      * @return the bundle
@@ -21,11 +20,15 @@ public abstract class MamResponseBundleMessage extends MamResponse {
     /**
      * @return the messageId
      */
-    public Trits getMessageId() {
-        if (null != messageId) {
-            return messageId;
+    public Trytes getMessageId() {
+        return messageId;
+    }
+    
+    public void setMessageId(byte[] messageId) {
+        int[] intTrits = new int[messageId.length];
+        for (int i = 0; i < messageId.length; i++) {
+            intTrits[i] = messageId[i];
         }
-        
-        return messageId = new Trits(tritsId);
+        this.messageId = new Trytes(Converter.trytes(intTrits));
     }
 }
