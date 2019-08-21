@@ -1,19 +1,26 @@
 package org.iota.jota.dto;
 
-import org.iota.jota.types.Trits;
+import org.iota.jota.types.Trytes;
+import org.iota.jota.utils.Converter;
 
 public class MamReturnSerialised extends MamResponse {
-    
-    //TODO: Change to bytes
-    private int[] serialisedBytes;
 
-    private Trits trits;
+    private Trytes serialisedState;
 
-    public Trits getSerialisedTrits() {
-        if (null != trits) {
-            return trits;
+    /**
+     * Called from JNI
+     * 
+     * @param serialisedTrits
+     */
+    public void setSerialisedTrits(byte[] serialisedTrits) {
+        int[] intTrits = new int[serialisedTrits.length];
+        for (int i = 0; i < intTrits.length; i++) {
+            intTrits[i] = serialisedTrits[i];
         }
-        
-        return trits = new Trits(serialisedBytes);
+        serialisedState = new Trytes(Converter.trytes(intTrits));
+    }
+    
+    public Trytes getSerialisedState() {
+        return serialisedState;
     }
 }

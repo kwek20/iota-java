@@ -193,9 +193,10 @@ public interface Mam {
      *
      * @param messageId The message ID
      * @param order     The packet order
+     * @param bundle    The bundle we are writing this to
      * @return the tag
      */
-    MamWriteTagResponse writeTag(Trits messageId, int order);
+    MamWriteTagResponse writeTag(Trits messageId, int order, Bundle bundle);
 
     /**
      * Writes a MAM header through a channel into a bundle
@@ -203,10 +204,11 @@ public interface Mam {
      * @param channelId The channel ID
      * @param psks      Pre-Shared Keys used for encrypting the session key
      * @param ntru_pks  NTRU public keys used for encrypting the session key
+     * @param bundle    The bundle we are writing this to
      * @return a status code, the bundle and message ID
      */
     MamWriteHeaderOnChannelResponse writeHeaderOnChannel(String channelId, mam_psk_t_set_entry_t[] psks,
-            mam_ntru_pk_t_set_entry_t[] ntru_pks);
+            mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle);
 
     /**
      * Writes a MAM header through an endpoint into a bundle
@@ -215,10 +217,11 @@ public interface Mam {
      * @param endpointId The endpoint ID
      * @param psks       Pre-Shared Keys used for encrypting the session key
      * @param ntru_pks   NTRU public keys used for encrypting the session key
+     * @param bundle     The bundle we are writing this to
      * @return a status code, the bundle and message ID
      */
     MamWriteHeaderOnEndpointResponse writeHeaderOnEndpoint(String channelId, String endpointId,
-            mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks);
+            mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle);
 
     /**
      * Writes an announcement of a channel into a bundle
@@ -227,10 +230,11 @@ public interface Mam {
      * @param newChannelId The new channel ID
      * @param psks         Pre-Shared Keys used for encrypting the session key
      * @param ntru_pks     NTRU public keys used for encrypting the session key
+     * @param bundle       The bundle we are writing this to
      * @return a status code, the bundle and message ID
      */
     MamAnnounceChannelResponse announceChannel(String channelId, String newChannelId, mam_psk_t_set_entry_t[] psks,
-            mam_ntru_pk_t_set_entry_t[] ntru_pks);
+            mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle);
 
     /**
      * Writes an announcement of a endpoint into a bundle
@@ -239,18 +243,20 @@ public interface Mam {
      * @param newEndpointId The new endpoint ID
      * @param psks          Pre-Shared Keys used for encrypting the session key
      * @param ntru_pks      NTRU public keys used for encrypting the session key
+     * @param bundle        The bundle we are writing this to
      * @return a status code, the bundle and message ID
      */
     MamAnnounceEndpointResponse announceEndpoint(String channelId, String newEndpointId, mam_psk_t_set_entry_t[] psks,
-            mam_ntru_pk_t_set_entry_t[] ntru_pks);
+            mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle);
 
     /**
      * Writes a MAM packet into a bundle
      *
-     * @param msg_id         The message ID
+     * @param messageId      The message ID
      * @param payload        Payload to write into the packet
-     * @param payload        size The payload size
+     * @param payloadSize    The payload size
      * @param is_last_packet Indicates whether or not this is the last packet
+     * @param bundle         The bundle we are writing this to
      * @return a status code and the bundle we wrote to
      */
     MamWritePacketToBundleResponse writePacketToBundle(Trytes messageId, Trytes payload, long payloadSize,

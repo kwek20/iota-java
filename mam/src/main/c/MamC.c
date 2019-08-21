@@ -68,11 +68,11 @@ void set_long_field(JNIEnv *env, jobject javaObj, char *package, char *field, si
 	}
 }
 
-void call_string_setter(JNIEnv *env, jobject javaObj, char *package, char *method, char *text){
+void call_string_setter(JNIEnv *env, jobject javaObj, char *package, char *method, signed char *text){
   	jclass ent_clazz = (*env)->FindClass(env, package);
 	if (!ent_clazz) return;
 	
-	jmethodID mid = env->GetMethodID( ent_clazz, method, "([java/lang/String;)V");
+	jmethodID mid = (*env)->GetMethodID(env, ent_clazz, method, "([java/lang/String;)V");
 	if (!mid) return;
 	
 	jstring jstr = (*env)->NewStringUTF(env, text);
@@ -85,7 +85,7 @@ void call_string_setter(JNIEnv *env, jobject javaObj, char *package, char *metho
 	(*env)->CallVoidMethod(env, javaObj, mid, jstr);
 }
 
-void set_string_field(JNIEnv *env, jobject javaObj, char *package, char *field, char *text){
+void set_string_field(JNIEnv *env, jobject javaObj, char *package, char *field, signed char *text){
   	jclass ent_clazz = (*env)->FindClass(env, package);
 	if (!ent_clazz) return;
 	
@@ -103,23 +103,38 @@ void set_string_field(JNIEnv *env, jobject javaObj, char *package, char *field, 
 	(*env)->SetObjectField(env, javaObj, fid, jstr);
 }
 
-void call_byte_setter(JNIEnv *env, jobject javaObj, char *package, char *method, byte *bytes){
+void call_byte_setter(JNIEnv *env, jobject javaObj, char *package, char *method, signed byte *bytes){
 	jclass ent_clazz = (*env)->FindClass(env, package);
 	if (!ent_clazz) return;
 	
-	jmethodID mid = env->GetMethodID( mvclass, method, "([B)V");
+	jmethodID mid = (*env)->GetMethodID(env, ent_clazz, method, "([B)V");
 	if (!mid) return;
 	
 	(*env)->CallVoidMethod(env, javaObj, mid, bytes);
 }
 
+bundle_transactions_t *bundleFromJavaBundle(jobject javaBundle){
+	bundle_transactions_t *bundle = NULL;
+
+	bundle_transactions_new(&bundle);
+	
+	return bundle;
+} 
+
+void fillJavaBundleFromC(jobject javaBundle, bundle_transactions_t *bundle){
+	
+}
+
+/*********************
+****** END UTIL ******
+**********************/
 
 /*
  * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_init
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1init(JNIEnv *env, jclass clazz, jstring seed){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1init(JNIEnv *env, jclass clazz, jstring seed){
   	const char *inCStr = (*env)->GetStringUTFChars(env, seed, NULL);
   	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
   	
@@ -131,14 +146,15 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1init(JNIEnv *env, jcl
  * Method:    mam_api_destroy
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1destroy(JNIEnv *env, jclass clazz){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1destroy(JNIEnv *env, jclass clazz){
   	return mam_api_destroy(&api);
 }
 
 /*
  * Method:    mam_api_add_trusted_channel_pk
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1trusted_1channel_pk(JNIEnv *env, jclass clazz, jstring pk){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1trusted_1channel_pk(JNIEnv *env, jclass clazz, jstring pk){
+  	//TODO
   	const char *inCStr = (*env)->GetStringUTFChars(env, pk, NULL);
   	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
   	
@@ -150,7 +166,8 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1trusted_1channel
 /*
  * Method:    mam_api_add_trusted_endpoint_pk
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1trusted_1endpoint_1pk(JNIEnv *env, jclass clazz, jstring pk){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1trusted_1endpoint_1pk(JNIEnv *env, jclass clazz, jstring pk){
+  	//TODO
   	const char *inCStr = (*env)->GetStringUTFChars(env, pk, NULL);
   	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
   	
@@ -161,8 +178,8 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1trusted_1endpoin
 /*
  * Method:    mam_api_add_ntru_sk
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1ntru_1sk(JNIEnv *env, jclass clazz, jclass ntru_sk){
-  	
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1ntru_1sk(JNIEnv *env, jclass clazz, jclass ntru_sk){
+  	//TODO
   	size_t code = mam_api_add_ntru_sk(&api, ntru_sk);
   	return code;
 }
@@ -170,8 +187,8 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1ntru_1sk(JNIEnv 
 /*
  * Method:    mam_api_add_ntru_pk
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1ntru_1pk(JNIEnv *env, jclass clazz, jclass ntru_pk){
-  	
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1ntru_1pk(JNIEnv *env, jclass clazz, jclass ntru_pk){
+	//TODO
   	size_t code = mam_api_add_ntru_pk(&api, ntru_pk);
   	return code;
 }
@@ -179,90 +196,75 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1ntru_1pk(JNIEnv 
 /*
  * Method:    mam_api_add_psk
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1psk(JNIEnv *env, jclass clazz, jclass psk){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1psk(JNIEnv *env, jclass clazz, jclass psk){
+  	//TODO
   	const char *inCStr = (*env)->GetStringUTFChars(env, psk, NULL);
-  	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
   	
   	size_t code = mam_api_add_psk(&api, psk);
   	return code;
 }
 
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_channel_create
- * Signature: (JLjava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1channel_1create
-  (JNIEnv *env, jclass clazz, jlong height, jstring channelId){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1channel_1create
+  (JNIEnv *env, jclass clazz, jobject returnObject, jlong height){
   	tryte_t channel_id[MAM_CHANNEL_ID_TRYTE_SIZE];
   	
   	retcode_t code = mam_api_channel_create(&api, height, channel_id);
-  	set_string_field(env, returnObject, "org/iota/jota/c/dto/MamCreateChannelResponse", "channel_id", channel_id);
+  	set_string_field(env, returnObject, "org/iota/jota/c/dto/MamCreateChannelResponse", "channel_id", &channel_id);
 	return code;
 }
 
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_channel_remaining_sks
- * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1channel_1remaining_1sks(JNIEnv *env, jclass clazz, jstring endpoint_id){
-  	const char *inCStr = (*env)->GetStringUTFChars(env, endpoint_id, NULL);
-  	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
-  	
-  	return mam_api_channel_remaining_sks(&api, trytes);
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1channel_1remaining_1sks(JNIEnv *env, jclass clazz, jstring endpointId){
+  	const char *endpoint_id = (*env)->GetStringUTFChars(env, endpointId, NULL);
+  	return mam_api_channel_remaining_sks(&api, endpoint_id);
 }
 
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_endpoint_create
- * Signature: (JLjava/lang/String;Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1endpoint_1create
-  (JNIEnv *env, jclass clazz, jlong height, jstring channelId, jstring endpointId){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1endpoint_1create
+  (JNIEnv *env, jclass clazz, jobject returnObject, jlong height, jstring channelId){
   	const tryte_t *channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, channelId, NULL);
   	
 	// Out
   	tryte_t endpoint_id[MAM_ENDPOINT_ID_TRYTE_SIZE];
   	
 	retcode_t code = mam_api_endpoint_create(&api, height, channel_id, endpoint_id);
-	set_string_field(env, returnObject, "org/iota/jota/c/dto/MamCreateEndpointResponse", "endpoint_id", endpoint_id);
+	set_string_field(env, returnObject, "org/iota/jota/c/dto/MamCreateEndpointResponse", "endpoint_id", &endpoint_id);
 	return code;
 }
   
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_endpoint_remaining_sks
- * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1endpoint_1remaining_1sks(JNIEnv *env, jclass clazz, jstring endpoint_id){
-  	const char *inCStr = (*env)->GetStringUTFChars(env, endpoint_id, NULL);
-  	tryte_t *trytes = malloc(sizeof(tryte_t) * sizeof(inCStr));
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1endpoint_1remaining_1sks(JNIEnv *env, jclass clazz, jstring channelId, jstring endpointId){
+  	const char *channel_id = (*env)->GetStringUTFChars(env, channelId, NULL);
+  	const char *endpoint_id = (*env)->GetStringUTFChars(env, endpointId, NULL);
   	
-  	return mam_api_endpoint_remaining_sks(&api, trytes);
+  	return mam_api_endpoint_remaining_sks(&api, channel_id, endpoint_id);
 }
 
 /*
  * Method:    mam_api_write_tag
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1write_1tag(JNIEnv *env, jclass clazz, jobject returnObject, trit_t const *const msg_id, trint18_t const ord){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1write_1tag(JNIEnv *env, jclass clazz, jobject returnObject, trit_t const *const msg_id, trint18_t const ord, jobject javaBundle){
 	trit_t tag[NUM_TRITS_TAG];
 	mam_api_write_tag(tag, msg_id, ord);
 	
   	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamWriteTagResponse", "setByteTag", tag);
 	return 0;
 }
-  
-/*
-###############################################################
-*/
-
 
 /*
  * Method:    mam_api_bundle_write_header_on_channel
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1header_1on_1channel
-  (JNIEnv *env, jclass clazz, jobject response, jstring ch_id, jobjectArray psks, jobjectArray ntru_pks){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1header_1on_1channel
+  (JNIEnv *env, jclass clazz, jobject returnObject, jstring ch_id, jobjectArray psks, jobjectArray ntru_pks, jobject javaBundle){
   	
   	const tryte_t *channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, ch_id, NULL);
   	
@@ -280,8 +282,8 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1header
 /*
  * Method:    mam_api_bundle_write_header_on_endpoint
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1header_1on_1endpoint
-  (JNIEnv *env, jclass clazz, jobject response, jstring ch_id, jstring ep_id, jobjectArray psks, jobjectArray ntru_pks, jobject obj, jbyteArray byteArray){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1header_1on_1endpoint
+  (JNIEnv *env, jclass clazz, jobject returnObject, jstring ch_id, jstring ep_id, jobjectArray psks, jobjectArray ntru_pks, jobject obj, jbyteArray byteArray, jobject javaBundle){
   	const tryte_t *channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, ch_id, NULL);
   	const tryte_t *endpoint_id = (tryte_t *) (*env)->GetStringUTFChars(env, ep_id, NULL);
   	
@@ -298,8 +300,8 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1header
 /*
  * Method:    mam_api_bundle_announce_channel
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1announce_1channel
-	(JNIEnv *env, jclass clazz, jobject response, jstring ch_id, jstring new_ch_id, jobject psks, jobject ntru_pks){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1announce_1channel
+	(JNIEnv *env, jclass clazz, jobject returnObject, jstring ch_id, jstring new_ch_id, jobject psks, jobject ntru_pks, jobject javaBundle){
 	const tryte_t *channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, ch_id, NULL);
   	const tryte_t *new_channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, new_ch_id, NULL);
   	
@@ -308,7 +310,7 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1announce_1cha
   	
 	trit_t message_id[MAM_MSG_ID_SIZE];
 	
-	retcode_t code = mam_api_bundle_announce_channel(&api, channel_id, endpoint_id, NULL, NULL, bundle, message_id);
+	retcode_t code = mam_api_bundle_announce_channel(&api, channel_id, new_channel_id, NULL, NULL, bundle, message_id);
 	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamResponseBundleMessage", "setMessageId", message_id);
 	return code;
 }
@@ -316,8 +318,8 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1announce_1cha
 /*
  * Method:    mam_api_bundle_announce_endpoint
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1announce_1endpoint
-	(JNIEnv *env, jclass clazz, jobject response, jstring ch_id, jstring new_ep_id, jobject psks, jobject ntru_pks){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1announce_1endpoint
+	(JNIEnv *env, jclass clazz, jobject returnObject, jstring ch_id, jstring new_ep_id, jobject psks, jobject ntru_pks, jobject javaBundle){
 	const tryte_t *channel_id = (tryte_t *) (*env)->GetStringUTFChars(env, ch_id, NULL);
   	const tryte_t *new_endpoint_id = (tryte_t *) (*env)->GetStringUTFChars(env, new_ep_id, NULL);
   	
@@ -326,7 +328,7 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1announce_1end
   	
 	trit_t message_id[MAM_MSG_ID_SIZE];
 	
-	retcode_t code = mam_api_bundle_announce_endpoint(&api, channel_id, endpoint_id, NULL, NULL, bundle, message_id);
+	retcode_t code = mam_api_bundle_announce_endpoint(&api, channel_id, new_endpoint_id, NULL, NULL, bundle, message_id);
 	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamResponseBundleMessage", "setMessageId", message_id);
 	return code;
 }
@@ -334,27 +336,31 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1announce_1end
 /*
  * Method:    mam_api_bundle_write_packet
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1packet
-  (JNIEnv *env, jclass clazz, jobject response, jintArray msg_id, jstring payload, jlong payload_size, jint checksum_int, jboolean is_last){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1packet
+  (JNIEnv *env, jclass clazz, jobject returnObject, jintArray msg_id, jstring payload, jlong payload_size, jint checksum_int, jboolean is_last, jobject javaBundle){
   	mam_msg_checksum_t checksum = (mam_msg_checksum_t) checksum_int;
   	const tryte_t *write_payload = (tryte_t *) (*env)->GetStringUTFChars(env, payload, NULL);
   	
   	jsize len = (*env)->GetArrayLength(env, msg_id);
-  	jintArray message_id = (*env)->NewIntArray(env, len);
-    (*env)->SetIntArrayRegion(env, message_id, 0, len, msg_id);
-  	
+	trit_t * tr_buf_msg_id = malloc(sizeof(trit_t)*len);
+    (*env)->GetIntArrayRegion(env, msg_id, 0, len, tr_buf_msg_id);
+    
   	bundle_transactions_t *bundle = NULL;
   	bundle_transactions_new(&bundle);
   	
-  	retcode_t code = mam_api_bundle_write_packet(&api, message_id, write_payload, (int) payload_size, checksum, (bool) is_last, bundle);
+  	retcode_t code = mam_api_bundle_write_packet(&api, tr_buf_msg_id, write_payload, (long) payload_size, checksum, (bool) is_last, bundle);
+  	
+	free(tr_buf_msg_id);
   	return code;
 }
   
 /*
  * Method:    mam_api_bundle_read
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1read
-  (JNIEnv *env, jclass clazz, jobject response, jobject bundle){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1read
+  (JNIEnv *env, jclass clazz, jobject returnObject, jobject javaBundle){
+  
+  	bundle_transactions_t * bundle = bundleFromJavaBundle(javaBundle)
   
   	tryte_t *payload = NULL;
 	size_t payload_size = 0;
@@ -384,31 +390,40 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1serialized_1size
  * Method:    mam_api_serialize
  */
 JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1serialize
-  (JNIEnv *env, jclass clazz, jbyteArray byteArray, jstring encryptionKey, jlong keySize){
+  (JNIEnv *env, jclass clazz, jobject returnObject, jstring encryptionKey, jlong keySize){
   	size_t serialized_size = mam_api_serialized_size(&api);
 	trit_t *buffer = malloc(serialized_size * sizeof(trit_t));
 
    	const tryte_t *key = (tryte_t *) (*env)->GetStringUTFChars(env, encryptionKey, NULL);
 	mam_api_serialize(&api, buffer, key, keySize);
-	return  6;
+	
+	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamReturnSerialised", "setSerialisedTrits", buffer);
+	return 0;
   }
 
 /*
  * Method:    mam_api_deserialize
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1deserialize
-  (JNIEnv *env, jclass clazz, jbyteArray buffer, jlong serialized_size, jstring encryptionKey, jlong keySize){
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1deserialize
+  (JNIEnv *env, jclass clazz, jintArray buffer, jlong serialized_size, jstring encryptionKey, jlong keySize){
+  	
+  	
+  	jsize len = (*env)->GetArrayLength(env, buffer);
+	trit_t * tr_buf = malloc(sizeof(trit_t)*len);
+  	
+    (*env)->GetIntArrayRegion(env, buffer, 0, len, tr_buf);
+    
   	const tryte_t *key = (tryte_t *) (*env)->GetStringUTFChars(env, encryptionKey, NULL);
   	
-  	retcode_t ret = mam_api_deserialize(buffer, serialized_size, &api, key, keySize);
-	free(buffer);
+  	retcode_t ret = mam_api_deserialize(tr_buf, serialized_size, &api, key, keySize);
+	free(tr_buf);
 	return ret;
   }
 
 /*
  * Method:    mam_api_save
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1save
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1save
   (JNIEnv *env, jclass clazz, jstring fileName, jstring encryptionKey, jlong keySize){
   	const tryte_t *key = (tryte_t *) (*env)->GetStringUTFChars(env, encryptionKey, NULL);
   	const char *buffer = (*env)->GetStringUTFChars(env, fileName, NULL);
@@ -419,7 +434,7 @@ JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1save
 /*
  * Method:    mam_api_load
  */
-JNIEXPORT jint JNICALL Java_org_iota_jota_c_MamC_mam_1api_1load
+JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1load
   (JNIEnv *env, jclass clazz, jstring fileName, jstring encryptionKey, jlong keySize){
   	const tryte_t *key = (tryte_t *) (*env)->GetStringUTFChars(env, encryptionKey, NULL);
   	const char *buffer = (*env)->GetStringUTFChars(env, fileName, NULL);
