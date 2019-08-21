@@ -53,7 +53,7 @@ public class MamC implements Mam {
     private static native long mam_api_endpoint_remaining_sks(String channel_id, String endpoint_id);
   
     //TODO Byte buffer
-    private static native long mam_api_write_tag(MamWriteTagResponse ret, int[] message_id, int order, Bundle bundle);
+    private static native long mam_api_write_tag(MamWriteTagResponse ret, int[] message_id, int order);
     
     private static native long mam_api_bundle_write_header_on_channel(MamWriteHeaderOnChannelResponse response, String ch_id, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle);
 
@@ -200,9 +200,9 @@ public class MamC implements Mam {
     }
 
     @Override
-    public MamWriteTagResponse writeTag(Trits messageId, int order, Bundle bundle) {
+    public MamWriteTagResponse writeTag(Trits messageId, int order) {
         MamWriteTagResponse ret = new MamWriteTagResponse();
-        long code = mam_api_write_tag(ret, tritsToInts(messageId), order, bundle);
+        long code = mam_api_write_tag(ret, tritsToInts(messageId), order);
         ret.setReturnValue(code);
         return ret;
     }

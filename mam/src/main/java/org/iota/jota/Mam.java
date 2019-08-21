@@ -193,10 +193,9 @@ public interface Mam {
      *
      * @param messageId The message ID
      * @param order     The packet order
-     * @param bundle    The bundle we are writing this to
      * @return the tag
      */
-    MamWriteTagResponse writeTag(Trits messageId, int order, Bundle bundle);
+    MamWriteTagResponse writeTag(Trits messageId, int order);
 
     /**
      * Writes a MAM header through a channel into a bundle
