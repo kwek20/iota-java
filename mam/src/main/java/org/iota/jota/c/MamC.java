@@ -62,7 +62,7 @@ public class MamC implements Mam {
     private static native long mam_api_bundle_announce_endpoint(MamAnnounceEndpointResponse response, String ch_id, String new_ep_id, mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle);
     
     //TODO Byte buffer
-    private static native long mam_api_bundle_write_packet(MamWritePacketToBundleResponse response, int[] msg_id, String payload, long payload_size, int checksum, boolean is_last_packet, Bundle bundle);
+    private static native long mam_api_bundle_write_packet(MamWritePacketToBundleResponse response, char[] msg_id, String payload, long payload_size, int checksum, boolean is_last_packet, Bundle bundle);
 
     private static native long mam_api_bundle_read(MamReadBundleResponse response, Bundle bundle);
     
@@ -247,7 +247,7 @@ public class MamC implements Mam {
     public MamWritePacketToBundleResponse writePacketToBundle(Trytes messageId, Trytes payload, long payloadSize,
             MamChecksum checksum, boolean isLast, Bundle bundle) {
         MamWritePacketToBundleResponse response = new MamWritePacketToBundleResponse();
-        long code = mam_api_bundle_write_packet(response, messageId.toTrits(), payload.getTrytesString(), payloadSize, checksum.getNum(), isLast, bundle);
+        long code = mam_api_bundle_write_packet(response, intToChar(messageId.toTrits()), payload.getTrytesString(), payloadSize, checksum.getNum(), isLast, bundle);
         response.setReturnValue(code);
         return response;
     }
@@ -308,5 +308,14 @@ public class MamC implements Mam {
         }
         
         return trits;
+    }
+    
+    private char[] intToChar(int[] trits) {
+        char[] charTrits = new char[trits.length];
+        for (int i = 0; i < trits.length; i++) {
+            charTrits[i] = (char) trits[i];
+        }
+        
+        return charTrits;
     }
 }

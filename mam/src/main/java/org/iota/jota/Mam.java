@@ -174,7 +174,7 @@ public interface Mam {
      * Creates and adds an endpoint to the API
      *
      * @param height     The endpoint's MSS height
-     * @param channel_id The parent channel id
+     * @param channelId  The parent channel id
      * @return a status code and endpoint ID
      */
     MamCreateEndpointResponse createEndpoint(int height, Trytes channelId);
@@ -254,7 +254,7 @@ public interface Mam {
      * @param messageId      The message ID
      * @param payload        Payload to write into the packet
      * @param payloadSize    The payload size
-     * @param is_last_packet Indicates whether or not this is the last packet
+     * @param isLast         Indicates whether or not this is the last packet
      * @param bundle         The bundle we are writing this to
      * @return a status code and the bundle we wrote to
      */
@@ -280,10 +280,8 @@ public interface Mam {
     /**
      * Serializes the API into a buffer
      *
-     * @param api                  The API
-     * @param encr_key_trytes      The encryption key (optional - can be set to
-     *                             null)
-     * @param encr_key_trytes_size The encryption key size
+     * @param encryptionKey        The encryption key (optional - can be set to null)
+     * @param keySize              The encryption key size
      * @return return The serialized api trits
      */
     MamReturnSerialised serialize(Trytes encryptionKey, long keySize);
@@ -303,9 +301,8 @@ public interface Mam {
      * Saves the API into a file
      *
      * @param fileName             The file name where to serialize the API into
-     * @param encr_key_trytes      The encryption key (optional - can be set to
-     *                             null)
-     * @param encr_key_trytes_size The encryption key size
+     * @param encryptionKey        The encryption key (optional - can be set to null)
+     * @param keySize              The encryption key size
      * @return a status code
      */
     MamResponse saveApi(String fileName, Trytes encryptionKey, long keySize);
