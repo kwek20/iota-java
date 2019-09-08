@@ -176,9 +176,9 @@ public class MamC implements Mam {
     }
 
     @Override
-    public MamRemainingChannelKeysResponse getRemainingChannelSecretKeys(String channelId) {
+    public MamRemainingChannelKeysResponse getRemainingChannelSecretKeys(Trytes channelId) {
         MamRemainingChannelKeysResponse ret = new MamRemainingChannelKeysResponse();
-        long numChannelKeys = mam_api_channel_remaining_sks(channelId);
+        long numChannelKeys = mam_api_channel_remaining_sks(channelId.getTrytesString());
         ret.setNumChannelKeys(numChannelKeys);
         return ret;
     }
@@ -192,9 +192,9 @@ public class MamC implements Mam {
     }
 
     @Override
-    public MamRemainingEndpointKeysResponse getRemainingEndpointSecretKeys(String channelId, String endpointId) {
+    public MamRemainingEndpointKeysResponse getRemainingEndpointSecretKeys(Trytes channelId, Trytes endpointId) {
         MamRemainingEndpointKeysResponse ret = new MamRemainingEndpointKeysResponse();
-        long numChannelKeys = mam_api_channel_remaining_sks(channelId);
+        long numChannelKeys = mam_api_channel_remaining_sks(channelId.getTrytesString());
         ret.setNumEndpointKeys(numChannelKeys);
         return ret;
     }
@@ -208,37 +208,37 @@ public class MamC implements Mam {
     }
 
     @Override
-    public MamWriteHeaderOnChannelResponse writeHeaderOnChannel(String ch_id, mam_psk_t_set_entry_t[] psks,
+    public MamWriteHeaderOnChannelResponse writeHeaderOnChannel(Trytes ch_id, mam_psk_t_set_entry_t[] psks,
             mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle) {
         MamWriteHeaderOnChannelResponse ret = new MamWriteHeaderOnChannelResponse();
-        long code = mam_api_bundle_write_header_on_channel(ret, ch_id, psks, ntru_pks, bundle);
+        long code = mam_api_bundle_write_header_on_channel(ret, ch_id.getTrytesString(), psks, ntru_pks, bundle);
         ret.setReturnValue(code);
         return ret;
     }
 
     @Override
-    public MamWriteHeaderOnEndpointResponse writeHeaderOnEndpoint(String ch_id, String ep_id,
+    public MamWriteHeaderOnEndpointResponse writeHeaderOnEndpoint(Trytes ch_id, Trytes ep_id,
             mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle) {
         MamWriteHeaderOnEndpointResponse ret = new MamWriteHeaderOnEndpointResponse();
-        long code = mam_api_bundle_write_header_on_endpoint(ret, ch_id, ep_id, psks, ntru_pks, bundle);
+        long code = mam_api_bundle_write_header_on_endpoint(ret, ch_id.getTrytesString(), ep_id.getTrytesString(), psks, ntru_pks, bundle);
         ret.setReturnValue(code);
         return ret;
     }
 
     @Override
-    public MamAnnounceChannelResponse announceChannel(String ch_id, String new_ch_id, mam_psk_t_set_entry_t[] psks,
+    public MamAnnounceChannelResponse announceChannel(Trytes ch_id, Trytes new_ch_id, mam_psk_t_set_entry_t[] psks,
             mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle) {
         MamAnnounceChannelResponse ret = new MamAnnounceChannelResponse();
-        long code = mam_api_bundle_announce_channel(ret, ch_id, new_ch_id, psks, ntru_pks, bundle);
+        long code = mam_api_bundle_announce_channel(ret, ch_id.getTrytesString(), new_ch_id.getTrytesString(), psks, ntru_pks, bundle);
         ret.setReturnValue(code);
         return ret;
     }
 
     @Override
-    public MamAnnounceEndpointResponse announceEndpoint(String ch_id, String new_ep_id, mam_psk_t_set_entry_t[] psks,
+    public MamAnnounceEndpointResponse announceEndpoint(Trytes ch_id, Trytes new_ep_id, mam_psk_t_set_entry_t[] psks,
             mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle) {
         MamAnnounceEndpointResponse ret = new MamAnnounceEndpointResponse();
-        long code = mam_api_bundle_announce_endpoint(ret, ch_id, new_ep_id, psks, ntru_pks, bundle);
+        long code = mam_api_bundle_announce_endpoint(ret, ch_id.getTrytesString(), new_ep_id.getTrytesString(), psks, ntru_pks, bundle);
         ret.setReturnValue(code);
         return ret;
     }

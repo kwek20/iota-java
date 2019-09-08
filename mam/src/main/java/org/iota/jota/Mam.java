@@ -168,7 +168,7 @@ public interface Mam {
      * @param channelId The channel id
      * @return the number of remaining secret keys of the channel
      */
-    MamRemainingChannelKeysResponse getRemainingChannelSecretKeys(String channelId);
+    MamRemainingChannelKeysResponse getRemainingChannelSecretKeys(Trytes channelId);
 
     /**
      * Creates and adds an endpoint to the API
@@ -186,7 +186,7 @@ public interface Mam {
      * @param endpointId The endpoint id
      * @return the number of remaining secret keys of the endpoint
      */
-    MamRemainingEndpointKeysResponse getRemainingEndpointSecretKeys(String channelId, String endpointId);
+    MamRemainingEndpointKeysResponse getRemainingEndpointSecretKeys(Trytes channelId, Trytes endpointId);
 
     /**
      * Creates a MAM tag that can be used in IOTA transactions
@@ -206,7 +206,7 @@ public interface Mam {
      * @param bundle    The bundle we are writing this to
      * @return a status code, the bundle and message ID
      */
-    MamWriteHeaderOnChannelResponse writeHeaderOnChannel(String channelId, mam_psk_t_set_entry_t[] psks,
+    MamWriteHeaderOnChannelResponse writeHeaderOnChannel(Trytes channelId, mam_psk_t_set_entry_t[] psks,
             mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle);
 
     /**
@@ -219,7 +219,7 @@ public interface Mam {
      * @param bundle     The bundle we are writing this to
      * @return a status code, the bundle and message ID
      */
-    MamWriteHeaderOnEndpointResponse writeHeaderOnEndpoint(String channelId, String endpointId,
+    MamWriteHeaderOnEndpointResponse writeHeaderOnEndpoint(Trytes channelId, Trytes endpointId,
             mam_psk_t_set_entry_t[] psks, mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle);
 
     /**
@@ -232,7 +232,7 @@ public interface Mam {
      * @param bundle       The bundle we are writing this to
      * @return a status code, the bundle and message ID
      */
-    MamAnnounceChannelResponse announceChannel(String channelId, String newChannelId, mam_psk_t_set_entry_t[] psks,
+    MamAnnounceChannelResponse announceChannel(Trytes channelId, Trytes newChannelId, mam_psk_t_set_entry_t[] psks,
             mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle);
 
     /**
@@ -245,7 +245,7 @@ public interface Mam {
      * @param bundle        The bundle we are writing this to
      * @return a status code, the bundle and message ID
      */
-    MamAnnounceEndpointResponse announceEndpoint(String channelId, String newEndpointId, mam_psk_t_set_entry_t[] psks,
+    MamAnnounceEndpointResponse announceEndpoint(Trytes channelId, Trytes newEndpointId, mam_psk_t_set_entry_t[] psks,
             mam_ntru_pk_t_set_entry_t[] ntru_pks, Bundle bundle);
 
     /**

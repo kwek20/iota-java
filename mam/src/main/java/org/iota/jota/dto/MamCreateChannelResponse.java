@@ -15,7 +15,7 @@ public class MamCreateChannelResponse extends MamResponse {
      * @return the channelId
      */
     public Trytes getChannelId() {
-        return channelId;
+        return new Trytes(channel_id);
     }
 
 }

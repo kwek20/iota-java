@@ -9,27 +9,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#undef org_iota_jota_c_MamC_MAM_SPONGE_KEY_SIZE
-#define org_iota_jota_c_MamC_MAM_SPONGE_KEY_SIZE 243L
-#undef org_iota_jota_c_MamC_MAM_PSK_ID_SIZE
-#define org_iota_jota_c_MamC_MAM_PSK_ID_SIZE 81L
-#undef org_iota_jota_c_MamC_MAM_PSK_KEY_SIZE
-#define org_iota_jota_c_MamC_MAM_PSK_KEY_SIZE 243L
-#undef org_iota_jota_c_MamC_MAM_NTRU_ID_SIZE
-#define org_iota_jota_c_MamC_MAM_NTRU_ID_SIZE 81L
-#undef org_iota_jota_c_MamC_MAM_NTRU_PK_SIZE
-#define org_iota_jota_c_MamC_MAM_NTRU_PK_SIZE 9216L
-#undef org_iota_jota_c_MamC_MAM_NTRU_SK_SIZE
-#define org_iota_jota_c_MamC_MAM_NTRU_SK_SIZE 1024L
-#undef org_iota_jota_c_MamC_MAM_NTRU_KEY_SIZE
-#define org_iota_jota_c_MamC_MAM_NTRU_KEY_SIZE 243L
-#undef org_iota_jota_c_MamC_MAM_NTRU_EKEY_SIZE
-#define org_iota_jota_c_MamC_MAM_NTRU_EKEY_SIZE 9216L
 
 #undef TX_SIZE_TRITS
 #define TX_SIZE_TRITS 8019
 
-const int numOfFlexTritsForTxTrits = NUM_FLEX_TRITS_FOR_TRITS(TX_SIZE_TRITS);
+#undef TX_SIZE_TRYTES
+#define TX_SIZE_TRYTES TX_SIZE_TRITS / 3
+
+#undef FLEX_TRITS_FOR_TRITS_TX
+#define FLEX_TRITS_FOR_TRITS_TX NUM_FLEX_TRITS_FOR_TRITS(TX_SIZE_TRITS)
 
 mam_api_t api;
 
@@ -132,8 +120,8 @@ bundle_transactions_t *bundleFromJavaBundle(JNIEnv *env, jobject javaBundle){
 
 	bundle_transactions_new(&bundle);
 	
-	jclass bundleClass = (*env)->FindClass(env, "org/iota/jota/model/Bundle" );
-	jmethodID getTransactions = (*env)->GetMethodID(env, bundleClass , "getTransactions", "()Ljava/util/List;" );
+	jclass bundleClass = (*env)->FindClass(env, "org/iota/jota/model/Bundle");
+	jmethodID getTransactions = (*env)->GetMethodID(env, bundleClass , "getTransactions", "()Ljava/util/List;");
 	
 	jobject txList = (*env)->CallObjectMethod(env, javaBundle, getTransactions );
 	// If theres no list, this is a new bundle
@@ -141,24 +129,24 @@ bundle_transactions_t *bundleFromJavaBundle(JNIEnv *env, jobject javaBundle){
 		return bundle;
 	}
 
-	jclass transactionClass = (*env)->FindClass(env, "org/iota/jota/model/Transaction" );
-    jclass listClass = (*env)->FindClass(env, "java/util/List" );    
+	jclass transactionClass = (*env)->FindClass(env, "org/iota/jota/model/Transaction");
+    jclass listClass = (*env)->FindClass(env, "java/util/List");    
     
-	jmethodID toTrytes = (*env)->GetMethodID(env, transactionClass , "toTrytes", "()java/lang/String;" );
-	jmethodID getMethodID = (*env)->GetMethodID(env, listClass, "get", "(I)Ljava/lang/Object;" );
-	jmethodID sizeMethodID = (*env)->GetMethodID(env, listClass, "size", "()I" );
+	jmethodID toTrytes = (*env)->GetMethodID(env, transactionClass , "toTrytes", "()Ljava/lang/String;");
+	jmethodID getMethodID = (*env)->GetMethodID(env, listClass, "get", "(I)Ljava/lang/Object;");
+	jmethodID sizeMethodID = (*env)->GetMethodID(env, listClass, "size", "()I");
     int listItemsCount = (int)(*env)->CallIntMethod(env, txList, sizeMethodID );
-	for( int i=0; i<listItemsCount; ++i ){
-        jobject javaTx = (*env)->CallObjectMethod(env, txList, getMethodID, i - 1 );
+	for( int i=0; i<listItemsCount; i++ ){
+        jobject javaTx = (*env)->CallObjectMethod(env, txList, getMethodID, i);
 		jstring txTrytes = (*env)->CallObjectMethod(env, javaTx, toTrytes);
 		
         jboolean tx_isCopy;
         tryte_t *c_tx_trytes = (tryte_t *) (*env)->GetStringUTFChars(env, txTrytes, &tx_isCopy);
 		size_t trytes_len = strlen(c_tx_trytes);
 		
-        flex_trit_t *flex_trits = malloc(numOfFlexTritsForTxTrits * sizeof(flex_trit_t));
+        flex_trit_t *flex_trits = malloc(FLEX_TRITS_FOR_TRITS_TX * sizeof(flex_trit_t));
         
-        flex_trits_from_trytes(flex_trits, numOfFlexTritsForTxTrits, c_tx_trytes, trytes_len, trytes_len);
+        flex_trits_from_trytes(flex_trits, FLEX_TRITS_FOR_TRITS_TX, c_tx_trytes, trytes_len, trytes_len);
         
         iota_transaction_t *c_transaction = transaction_deserialize(flex_trits, false);
         bundle_transactions_add(bundle, c_transaction);
@@ -172,9 +160,38 @@ bundle_transactions_t *bundleFromJavaBundle(JNIEnv *env, jobject javaBundle){
 } 
 
 void fillJavaBundleFromC(JNIEnv *env, jobject javaBundle, bundle_transactions_t *bundle){
+
+	jclass transactionClass = (*env)->FindClass(env, "org/iota/jota/model/Transaction");
+	jclass bundleClass = (*env)->FindClass(env, "org/iota/jota/model/Bundle");
 	
+	jmethodID addTransaction = (*env)->GetMethodID(env, bundleClass , "addTransaction", "(Lorg/iota/jota/model/Transaction;)V");
+	jmethodID getTransactions = (*env)->GetMethodID(env, bundleClass , "getTransactions", "()Ljava/util/List;");
+	jmethodID transactionConstructorTrytes = (*env)->GetMethodID(env, transactionClass , "<init>", "(Ljava/lang/String;)V");
 	
-	//transaction_serialize_on_flex_trits
+	jobject txList = (*env)->CallObjectMethod(env, javaBundle, getTransactions );
+	if (txList != NULL) {
+		// clean bundle if not null
+    	jclass listClass = (*env)->FindClass(env, "java/util/List"); 
+		jmethodID cleanMethodId = (*env)->GetMethodID(env, listClass, "clean", "()V"); 
+		(*env)->CallVoidMethod(env, txList, cleanMethodId );
+	} // If its null, calling add will create the list
+	
+	size_t bundleTxCount = bundle_transactions_size(bundle);
+	for( size_t i=0; i<bundleTxCount; i++ ){
+		// convert to char *
+		iota_transaction_t *transaction = bundle_at(bundle, i);
+		
+        flex_trit_t *flex_trits = malloc(FLEX_TRITS_FOR_TRITS_TX * sizeof(flex_trit_t));
+		size_t ret_code = transaction_serialize_on_flex_trits(transaction, flex_trits);
+		
+		tryte_t *trytes = malloc(TX_SIZE_TRYTES * sizeof(tryte_t));
+		flex_trits_to_trytes(trytes, TX_SIZE_TRYTES, flex_trits, FLEX_TRITS_FOR_TRITS_TX, FLEX_TRITS_FOR_TRITS_TX);
+		
+		// add to bundle 
+		jstring tryteText = (*env)->NewStringUTF(env, (char *)trytes);
+ 		jobject txObject = (*env)->NewObject(env, transactionClass, transactionConstructorTrytes, tryteText);
+ 		(*env)->CallVoidMethod(env, javaBundle, addTransaction, txObject);
+	}
 }
 
 /*********************
@@ -182,9 +199,7 @@ void fillJavaBundleFromC(JNIEnv *env, jobject javaBundle, bundle_transactions_t 
 **********************/
 
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_init
- * Signature: (Ljava/lang/String;)I
  */
 JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1init(JNIEnv *env, jclass clazz, jstring seed){
   	jboolean seed_isCopy;
@@ -198,9 +213,7 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1init(JNIEnv *env, jc
 }
 
 /*
- * Class:     org_iota_jota_c_MamC
  * Method:    mam_api_destroy
- * Signature: ()I
  */
 JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1destroy(JNIEnv *env, jclass clazz){
   	return mam_api_destroy(&api);
@@ -270,10 +283,12 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1add_1psk(JNIEnv *env
  */
 JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1channel_1create
   (JNIEnv *env, jclass clazz, jobject returnObject, jlong height){
-  	tryte_t channel_id[MAM_CHANNEL_ID_TRYTE_SIZE];
-  	
+  	tryte_t channel_id[MAM_CHANNEL_ID_TRYTE_SIZE] = "";
+  	printf("len: %i -> %s", strlen(channel_id), channel_id);
   	retcode_t code = mam_api_channel_create(&api, height, channel_id);
-  	set_string_field(env, returnObject, "org/iota/jota/c/dto/MamCreateChannelResponse", "channel_id", &channel_id);
+  	printf("len: %i -> %s", strlen(channel_id), channel_id);
+  	channel_id[MAM_CHANNEL_ID_TRYTE_SIZE] = 0;
+  	set_string_field(env, returnObject, "org/iota/jota/dto/MamCreateChannelResponse", "channel_id", &channel_id);
 	return code;
 }
 
@@ -303,7 +318,7 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1endpoint_1create
   	tryte_t endpoint_id[MAM_ENDPOINT_ID_TRYTE_SIZE];
   	
 	retcode_t code = mam_api_endpoint_create(&api, height, channel_id, endpoint_id);
-	set_string_field(env, returnObject, "org/iota/jota/c/dto/MamCreateEndpointResponse", "endpoint_id", &endpoint_id);
+	set_string_field(env, returnObject, "org/iota/jota/dto/MamCreateEndpointResponse", "endpoint_id", &endpoint_id);
 	if (channel_id_isCopy == JNI_TRUE) {
 	    (*env)->ReleaseStringUTFChars(env, channelId, channel_id);
 	}
@@ -337,7 +352,7 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1write_1tag(JNIEnv *e
 	trit_t tag[NUM_TRITS_TAG];
 	mam_api_write_tag(tag, msg_id, ord);
 	
-  	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamWriteTagResponse", "setByteTag", tag);
+  	call_byte_setter(env, returnObject, "org/iota/jota/dto/MamWriteTagResponse", "setByteTag", tag);
 	return 0;
 }
 
@@ -355,7 +370,7 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1heade
 	trit_t message_id[MAM_MSG_ID_SIZE];
 	
 	retcode_t ret = mam_api_bundle_write_header_on_channel(&api, channel_id, NULL, NULL, bundle, message_id);
-	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamResponseBundleMessage", "setMessageId", message_id);
+	call_byte_setter(env, returnObject, "org/iota/jota/dto/MamResponseBundleMessage", "setMessageId", message_id);
 	
 	if (channel_id_isCopy == JNI_TRUE) {
 	    (*env)->ReleaseStringUTFChars(env, ch_id, channel_id);
@@ -379,7 +394,7 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1write_1heade
 	trit_t message_id[MAM_MSG_ID_SIZE];
 	
 	retcode_t code = mam_api_bundle_write_header_on_endpoint(&api, channel_id, endpoint_id, NULL, NULL, bundle, message_id);
-	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamResponseBundleMessage", "setMessageId", message_id);
+	call_byte_setter(env, returnObject, "org/iota/jota/dto/MamResponseBundleMessage", "setMessageId", message_id);
 	
 	if (channel_id_isCopy == JNI_TRUE) {
 	    (*env)->ReleaseStringUTFChars(env, ch_id, channel_id);
@@ -407,7 +422,7 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1announce_1ch
 	trit_t message_id[MAM_MSG_ID_SIZE];
 	
 	retcode_t code = mam_api_bundle_announce_channel(&api, channel_id, new_channel_id, NULL, NULL, bundle, message_id);
-	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamResponseBundleMessage", "setMessageId", message_id);
+	call_byte_setter(env, returnObject, "org/iota/jota/dto/MamResponseBundleMessage", "setMessageId", message_id);
 	
 	if (channel_id_isCopy == JNI_TRUE) {
 	    (*env)->ReleaseStringUTFChars(env, ch_id, channel_id);
@@ -435,7 +450,7 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1announce_1en
 	trit_t message_id[MAM_MSG_ID_SIZE];
 	
 	retcode_t code = mam_api_bundle_announce_endpoint(&api, channel_id, new_endpoint_id, NULL, NULL, bundle, message_id);
-	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamResponseBundleMessage", "setMessageId", message_id);
+	call_byte_setter(env, returnObject, "org/iota/jota/dto/MamResponseBundleMessage", "setMessageId", message_id);
 	
 	if (channel_id_isCopy == JNI_TRUE) {
 	    (*env)->ReleaseStringUTFChars(env, ch_id, channel_id);
@@ -486,9 +501,9 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1read
 	
 	retcode_t code = mam_api_bundle_read(&api, bundle, &read_payload, &payload_size, &is_last_packet);
 	
-  	set_long_field(env, returnObject, "org/iota/jota/c/dto/MamReadBundleResponse", "payloadSize", payload_size);
-	call_string_setter(env, returnObject, "org/iota/jota/c/dto/MamReadBundleResponse", "setPayload", (char *)read_payload);
-	set_bool_field(env, returnObject, "org/iota/jota/c/dto/MamReadBundleResponse", "isLast", is_last_packet);
+  	set_long_field(env, returnObject, "org/iota/jota/dto/MamReadBundleResponse", "payloadSize", payload_size);
+	call_string_setter(env, returnObject, "org/iota/jota/dto/MamReadBundleResponse", "setPayload", (char *)read_payload);
+	set_bool_field(env, returnObject, "org/iota/jota/dto/MamReadBundleResponse", "isLast", is_last_packet);
 	free(read_payload);
   	return code;
 }
@@ -500,7 +515,7 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1bundle_1read
 JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1serialized_1size
   (JNIEnv *env, jclass clazz, jobject returnObject){
   	size_t size =  mam_api_serialized_size(&api);
-  	set_long_field(env, returnObject, "org/iota/jota/c/dto/ReturnSerialisedSize", "size", size);
+  	set_long_field(env, returnObject, "org/iota/jota/dto/MamReturnSerialisedSize", "size", size);
   	return 0;
 }
 
@@ -516,7 +531,7 @@ JNIEXPORT jlong JNICALL Java_org_iota_jota_c_MamC_mam_1api_1serialize
    	const tryte_t *key = (tryte_t *) (*env)->GetStringUTFChars(env, encryptionKey, &key_isCopy);
 	mam_api_serialize(&api, buffer, key, keySize);
 	
-	call_byte_setter(env, returnObject, "org/iota/jota/c/dto/MamReturnSerialised", "setSerialisedTrits", buffer);
+	call_byte_setter(env, returnObject, "org/iota/jota/dto/MamReturnSerialised", "setSerialisedTrits", buffer);
 	
 	if (key_isCopy == JNI_TRUE) {
 	    (*env)->ReleaseStringUTFChars(env, encryptionKey, key);
