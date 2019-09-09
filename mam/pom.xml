@@ -71,14 +71,14 @@
 						</options>
 					    
 					    <includePaths>
-					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/com_github_uthash/_virtual_includes/uthash</includePath>
-					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/keccak/_virtual_includes/keccak_sponge_common</includePath>
-					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/keccak/_virtual_includes/keccak_sponge_1600</includePath>
-					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/keccak/_virtual_includes/common</includePath>
-					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/keccak/_virtual_includes/snp_1600_reference</includePath>
-					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/keccak/_virtual_includes/keccak</includePath>
-					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-entangled</includePath>
-					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin</includePath>
+					      	<includePath>/entangled/bazel-bin/external/com_github_uthash/_virtual_includes/uthash</includePath>
+					      	<includePath>/entangled/bazel-bin/external/keccak/_virtual_includes/keccak_sponge_common</includePath>
+					      	<includePath>/entangled/bazel-bin/external/keccak/_virtual_includes/keccak_sponge_1600</includePath>
+					      	<includePath>/entangled/bazel-bin/external/keccak/_virtual_includes/common</includePath>
+					      	<includePath>/entangled/bazel-bin/external/keccak/_virtual_includes/snp_1600_reference</includePath>
+					      	<includePath>/entangled/bazel-bin/external/keccak/_virtual_includes/keccak</includePath>
+					      	<includePath>/entangled/bazel-entangled</includePath>
+					      	<includePath>/entangled/bazel-bin</includePath>
 					    </includePaths>
 				  	</c>
 				  	
