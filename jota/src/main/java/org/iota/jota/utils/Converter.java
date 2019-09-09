@@ -22,7 +22,7 @@ public class Converter {
     /**
      * The number of trits in a byte
      */
-    private static final int NUMBER_OF_TRITS_IN_A_BYTE = 5;
+    public static final int NUMBER_OF_TRITS_IN_A_BYTE = 5;
     /**
      * The number of trits in a tryte
      */
@@ -345,6 +345,12 @@ public class Converter {
                 break;
             }
         }
+    }
+
+    public static int[] bytesToTrits(byte[] bytes) {
+        int[] trits = new int[bytes.length * NUMBER_OF_TRITS_IN_A_BYTE];
+        getTrits(bytes, trits);
+        return trits;
     }
 
 }

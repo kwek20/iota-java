@@ -37,12 +37,12 @@ public class Constants {
     public static final int ADDRESS_LENGTH_WITH_CHECKSUM = 90;
 
     /**
-     * The length of an message
+     * The length of a message in trytes
      */
     public static final int MESSAGE_LENGTH = 2187;
     
     /**
-     * The length of a transaction
+     * The length of a transaction in trytes
      */
     public static final int TRANSACTION_LENGTH = 2673;
     
