@@ -271,14 +271,14 @@ public class MamC implements Mam {
     @Override
     public MamReturnSerialised serialize(Trytes encryptionKey, long keySize) {
         MamReturnSerialised response = new MamReturnSerialised();
-        mam_api_serialize(response, encryptionKey.getTrytesString(), keySize);
+        mam_api_serialize(response, encryptionKey != null ? encryptionKey.getTrytesString() : null, keySize);
         return response;
     }
 
     @Override
     public MamResponse deserialize(Trits encryptedApi, long encryptedSize, Trytes decryptionKey, long keySize) {
         MamResponse response = new MamResponse();
-        long code = mam_api_deserialize(tritsToInts(encryptedApi), encryptedSize, decryptionKey.getTrytesString(), keySize);
+        long code = mam_api_deserialize(tritsToInts(encryptedApi), encryptedSize, decryptionKey != null ? decryptionKey.getTrytesString() : null, keySize);
         
         response.setReturnValue(code);
         return response;
@@ -287,7 +287,7 @@ public class MamC implements Mam {
     @Override
     public MamResponse saveApi(String fileName, Trytes encryptionKey, long keySize) {
         MamResponse response = new MamResponse();
-        long code = mam_api_save(fileName, encryptionKey.getTrytesString(), keySize);
+        long code = mam_api_save(fileName, encryptionKey != null ? encryptionKey.getTrytesString() : null, keySize);
         response.setReturnValue(code);
         return response;
     }
@@ -295,7 +295,7 @@ public class MamC implements Mam {
     @Override
     public MamResponse loadApi(String fileName, Trytes decryptionKey, long keySize) {
         MamResponse response = new MamResponse();
-        long code = mam_api_load(fileName, decryptionKey.getTrytesString(), keySize);
+        long code = mam_api_load(fileName, decryptionKey != null ? decryptionKey.getTrytesString() : null, keySize);
         response.setReturnValue(code);
         return response;
     }

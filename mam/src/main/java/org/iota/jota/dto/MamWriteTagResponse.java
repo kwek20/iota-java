@@ -1,5 +1,7 @@
 package org.iota.jota.dto;
 
+import java.util.Arrays;
+
 import org.iota.jota.types.Trytes;
 import org.iota.jota.utils.Converter;
 
@@ -20,10 +22,8 @@ public class MamWriteTagResponse extends MamResponse {
      * @param tagTrits
      */
     public void setByteTag(byte[] tagTrits) {
-        int[] intTrits = new int[tagTrits.length];
-        for (int i = 0; i < intTrits.length; i++) {
-            intTrits[i] = tagTrits[i];
-        }
-        tag = new Trytes(Converter.trytes(intTrits));
+        int[] trits = Converter.bytesToTrits(tagTrits);
+        System.out.println(Arrays.toString(trits));
+        tag = new Trytes(Converter.trytes(trits));
     }
 }

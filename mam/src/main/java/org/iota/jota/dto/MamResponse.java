@@ -12,7 +12,6 @@ public class MamResponse {
     }
     
     public void setReturnValue(long returnValue) {
-        System.out.println("Setting code to" + returnValue);
         this.returnValue = returnValue;
     }
     

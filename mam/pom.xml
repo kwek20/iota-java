@@ -5,31 +5,35 @@
     <parent>
         <groupId>org.iota</groupId>
         <artifactId>jota-parent</artifactId>
-        <version>1.0.0-beta5</version>
+        <version>1.0.0-beta6</version>
     </parent>
 
     <name>JOTA : MAM</name>
     <artifactId>jota-mam</artifactId>
 	<packaging>nar</packaging>
-
+    
     <dependencies>
-    	<!-- <dependency>
+    	<dependency>
     		<groupId>org.iota</groupId>
     		<artifactId>jota</artifactId>
-    		<version>1.0.0-beta5</version>
-    	</dependency> -->
-
-		<dependency>
-		    <groupId>com.github.kwek20</groupId>
-		    <artifactId>iota-java</artifactId>
-		    <version>mam-v2-SNAPSHOT</version>
-		</dependency>
-
+    		<version>1.0.0-beta6</version>
+    	</dependency>
+    	
 	    <dependency>
 	      <groupId>org.scijava</groupId>
 	      <artifactId>native-lib-loader</artifactId>
 	      <version>2.0.2</version>
 	    </dependency>
+	    
+	    <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+        </dependency>
     </dependencies>
 
     
@@ -52,14 +56,20 @@
                 <version>3.2.3</version>
                 <extensions>true</extensions>
                 <configuration>
+                	<libsName>mam</libsName>
+                
                     <libraries>
                         <library>
                             <type>jni</type>
                             <narSystemPackage>org.iota.jota</narSystemPackage>
                         </library>
                     </libraries>
-                    
                     <c>
+                    	<name>gcc</name>
+                    	<options>
+							<option>-Wno-sign-conversion</option>
+						</options>
+					    
 					    <includePaths>
 					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/com_github_uthash/_virtual_includes/uthash</includePath>
 					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin/external/keccak/_virtual_includes/keccak_sponge_common</includePath>
@@ -71,6 +81,12 @@
 					      	<includePath>/home/brord/Desktop/Work/IOTA/Git/entangled/bazel-bin</includePath>
 					    </includePaths>
 				  	</c>
+				  	
+				  	<cpp>
+			            <options>
+							<option>-Wno-sign-conversion</option>
+						</options>
+		          	</cpp>
                     
                     <linker>
 					    <libs>

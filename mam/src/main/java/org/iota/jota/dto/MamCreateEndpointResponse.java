@@ -11,6 +11,6 @@ public class MamCreateEndpointResponse extends MamResponse {
      * @return the endpointId
      */
     public Trytes getEndpointId() {
-        return endpointId;
+        return new Trytes(endpoint_id);
     }
 }
