@@ -1,7 +1,10 @@
 package org.iota.jota.account.deposits.methods;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -19,6 +22,7 @@ import org.iota.jota.types.Hash;
 import org.iota.jota.utils.Constants;
 import org.iota.jota.utils.Converter;
 import org.iota.jota.utils.InputValidator;
+import org.iota.jota.utils.TrytesConverter;
 
 public class MagnetMethod implements DepositMethod<String> {
     
@@ -29,11 +33,13 @@ public class MagnetMethod implements DepositMethod<String> {
     public static final String CONDITION_EXPIRES = "timeout_at";
     public static final String CONDITION_MULTI_USE = "multi_use";
     public static final String CONDITION_AMOUNT = "expected_amount";
+    public static final String CONDITION_MESSAGE = "message";
     
     private static final String magnetUrl = SCHEME + "://%s/?" 
             + CONDITION_EXPIRES + "=%d&"
             + CONDITION_MULTI_USE + "=%b&"
-            + CONDITION_AMOUNT + "=%d";
+            + CONDITION_AMOUNT + "=%d&"
+            + CONDITION_MESSAGE + "=%s";
 
     public MagnetMethod() {
         this.curl = SpongeFactory.create(SpongeFactory.Mode.KERL);
@@ -48,6 +54,7 @@ public class MagnetMethod implements DepositMethod<String> {
         try {
             return parse(new URI(method));
         } catch (URISyntaxException e) {
+            e.printStackTrace();
             throw new MagnetError(e);
         }
     }
@@ -69,18 +76,23 @@ public class MagnetMethod implements DepositMethod<String> {
         long timeOut = parseLong(getParam(CONDITION_EXPIRES, paramsMap, "0"));
         boolean multiUse = Boolean.getBoolean(getParam(CONDITION_MULTI_USE, paramsMap, "false"));
         long expectedAmount = parseLong(getParam(CONDITION_AMOUNT, paramsMap, "0"));
-        
-        if (!magnetChecksum(address.substring(0, 81), timeOut, multiUse, expectedAmount)
+        String message = getParam(CONDITION_MESSAGE, paramsMap, "");
+
+        if (!magnetChecksum(address.substring(0, 81), timeOut, multiUse, expectedAmount, message)
                 .equals(address.substring(81, 90))) {
             throw new MagnetError("Magnet checksum does not match fields");
         }
+        try {
+            DepositRequest request = new DepositRequest(new Date(timeOut), multiUse, expectedAmount, URLDecoder.decode(message, "UTF-8"));
         
-        DepositRequest request = new DepositRequest(new Date(timeOut), multiUse, expectedAmount);
-        ConditionalDepositAddress conditions = new ConditionalDepositAddress(
-                request, 
-                new Hash(address.substring(0, 81)));
-        
-        return conditions;
+            ConditionalDepositAddress conditions = new ConditionalDepositAddress(
+                    request, 
+                    new Hash(address.substring(0, 81)));
+
+            return conditions;
+        } catch (UnsupportedEncodingException e) {
+            throw new MagnetError(e);
+        }
     }
 
     private long parseLong(String param) {
@@ -129,35 +141,59 @@ public class MagnetMethod implements DepositMethod<String> {
     }
 
     @Override
-    public String build(ConditionalDepositAddress conditions) {
+    public String build(ConditionalDepositAddress conditions) throws MagnetError {
         String address = conditions.getDepositAddress().getHash();
+        String message;
+        try {
+            message = URLEncoder.encode(conditions.getRequest().getMessage(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new MagnetError(e);
+        }
+        
         String magnetChecksum = magnetChecksum(address,
                 conditions.getRequest().getTimeOut().getTime(),
                 conditions.getRequest().isMultiUse(),
-                conditions.getRequest().getExpectedAmount());
+                conditions.getRequest().getExpectedAmount(),
+                message);
         
         return String.format(magnetUrl, 
                 address + magnetChecksum,
                 conditions.getRequest().getTimeOut().getTime(),
                 conditions.getRequest().isMultiUse(),
-                conditions.getRequest().getExpectedAmount());
+                conditions.getRequest().getExpectedAmount(),
+                message);
     }
 
+    /**
+     * Generates a magnet checksum from magnet fields
+     * 
+     * @param address Magnet address
+     * @param timeout Timeout of the magnet
+     * @param multiUse If we allow multi use in this magnet
+     * @param amount The amount for this CDA
+     * @param message URL encoded message
+     * @return The magnet checksum
+     */
     //Package private for testing
-    String magnetChecksum(String address, long timeout, boolean multiUse, long amount) {
+    String magnetChecksum(String address, long timeout, boolean multiUse, long amount, String message) {
         //Get checksum trits for address
         int[] addressTrits = calculateChecksum(Converter.trits(address));
+        
+        int[] messageTrits = Converter.trits(TrytesConverter.asciiToTrytes(message));
+        int[] paddedMessageTrits = new int[messageTrits.length == 0 ? 
+                Constants.HASH_LENGTH_TRITS : 
+                messageTrits.length + Constants.HASH_LENGTH_TRITS - messageTrits.length % Constants.HASH_LENGTH_TRITS];
+        System.arraycopy(messageTrits, 0, paddedMessageTrits, 0, messageTrits.length);
         
         //Get trits non-bool for fields
         int[] timeoutTrits = Converter.trits(timeout);
         int[] amountTrits = Converter.trits(amount);
         
         //trit input for checksum of magnet
-        int[] totalTrits = new int[Constants.HASH_LENGTH_TRITS];
+        int[] totalTrits = new int[Constants.HASH_LENGTH_TRITS + paddedMessageTrits.length];
 
         //timeout (27) + multi_use (1) + amount (81) = 109
         int addressRest = Constants.HASH_LENGTH_TRITS - 109;
-        //Copy part of address checksum into magnet checksum trits
         System.arraycopy(addressTrits, 0, totalTrits, 0, addressRest);
         
         //Add fields to trits input
@@ -165,6 +201,8 @@ public class MagnetMethod implements DepositMethod<String> {
         totalTrits[addressRest + 27] = multiUse ? 1 : 0;
         System.arraycopy(amountTrits, 0, totalTrits, addressRest + 27 + 1 + 81 - amountTrits.length, amountTrits.length);
 
+        System.arraycopy(paddedMessageTrits, 0, totalTrits, Constants.HASH_LENGTH_TRITS, paddedMessageTrits.length);
+        
         //Make checksum trits
         int[] checksumTrits = calculateChecksum(totalTrits);
         String checksum = Converter.trytes(checksumTrits);

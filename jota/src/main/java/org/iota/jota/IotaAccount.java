@@ -459,9 +459,9 @@ public class IotaAccount implements Account, EventListener {
      * {@inheritDoc}
      */
     @Override
-    public Future<ConditionalDepositAddress> newDepositAddress(Date timeOut, boolean multiUse, long expectedAmount,
+    public Future<ConditionalDepositAddress> newDepositAddress(Date timeOut, boolean multiUse, long expectedAmount, Optional<String> message,
             ExpireCondition... otherConditions) throws AccountError {
-        return newDepositRequest(new DepositRequest(timeOut, multiUse, expectedAmount), otherConditions);
+        return newDepositRequest(new DepositRequest(timeOut, multiUse, expectedAmount, message), otherConditions);
     }
     
     public Future<ConditionalDepositAddress> newDepositRequest(DepositRequest request, ExpireCondition... otherConditions) throws AccountError {

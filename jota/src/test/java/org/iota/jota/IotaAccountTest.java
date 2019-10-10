@@ -1,5 +1,18 @@
 package org.iota.jota;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.iota.jota.account.deposits.ConditionalDepositAddress;
@@ -14,15 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
-import java.util.concurrent.ExecutionException;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class IotaAccountTest {
@@ -81,7 +85,7 @@ public class IotaAccountTest {
         assertEquals(5, account.totalBalance(), "Account should have 5 total balance");
 
         Date timeOut = new Date(Long.MAX_VALUE);
-        ConditionalDepositAddress cda = account.newDepositAddress(timeOut, false, 10).get();
+        ConditionalDepositAddress cda = account.newDepositAddress(timeOut, false, 10, Optional.of("Test")).get();
 
         assertEquals(0, account.availableBalance(), "Account should have 0 usable balance");
         assertEquals(15, account.totalBalance(), "Account should have 15 total balance");
@@ -111,7 +115,7 @@ public class IotaAccountTest {
 
         Date timeOut = new Date(Long.MAX_VALUE);
         try {
-            account.newDepositAddress(timeOut, true, 10).get();
+            account.newDepositAddress(timeOut, true, 10, Optional.of("Test")).get();
             fail("Account should have thrown an error on a wrong CDA request");
         } catch (ExecutionException e){
             assertEquals("Cannot use multi-use and amount simultaneously", e.getCause().getMessage(),

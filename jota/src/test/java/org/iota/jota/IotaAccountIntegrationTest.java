@@ -1,5 +1,15 @@
 package org.iota.jota;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.iota.jota.account.deposits.ConditionalDepositAddress;
@@ -17,14 +27,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
-import java.util.concurrent.ExecutionException;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 public class IotaAccountIntegrationTest {
     
@@ -118,7 +120,7 @@ public class IotaAccountIntegrationTest {
         IotaAccount account = new IotaAccount.Builder(TEST_SEED).mwm(9).store(store).api(iotaAPI).build();
         
         Date timeOut = new Date(Long.MAX_VALUE);
-        ConditionalDepositAddress cda = account.newDepositAddress(timeOut, false, 10).get();
+        ConditionalDepositAddress cda = account.newDepositAddress(timeOut, false, 10, Optional.of("Test")).get();
         
         Bundle sent = account.send(cda.getDepositAddress().getHashCheckSum(), 5, 
                 "Another IOTA Accounts test run at " + new Date().toString(), 
@@ -137,7 +139,7 @@ public class IotaAccountIntegrationTest {
         IotaAccount account = new IotaAccount.Builder(TEST_SEED).mwm(9).store(store).api(iotaAPI).build();
         
         Date timeOut = new Date(Long.MAX_VALUE);
-        ConditionalDepositAddress cda = account.newDepositAddress(timeOut, false, 10).get();
+        ConditionalDepositAddress cda = account.newDepositAddress(timeOut, false, 10, Optional.of("Test")).get();
         
         Bundle sent = account.send(cda.getDepositAddress().getHashCheckSum(), 10, 
                 lorem, "IOTA9ACCOUNTS").get();
@@ -156,7 +158,7 @@ public class IotaAccountIntegrationTest {
         IotaAccount account = new IotaAccount.Builder(TEST_SEED).mwm(9).store(store).api(iotaAPI).build();
         
         Date timeOut = new Date(Long.MAX_VALUE);
-        ConditionalDepositAddress cda = account.newDepositAddress(timeOut, false, 10).get();
+        ConditionalDepositAddress cda = account.newDepositAddress(timeOut, false, 10, Optional.of("Test")).get();
         
         Bundle sent = account.send(cda.getDepositAddress().getHashCheckSum(), 10, 
                 lorem, "IOTA9ACCOUNTS").get();
@@ -175,7 +177,7 @@ public class IotaAccountIntegrationTest {
         IotaAccount account = new IotaAccount.Builder(TEST_SEED).mwm(9).store(store).api(iotaAPI).build();
         
         Date timeOut = new Date(Long.MAX_VALUE);
-        ConditionalDepositAddress cda = account.newDepositAddress(timeOut, false, 10).get();
+        ConditionalDepositAddress cda = account.newDepositAddress(timeOut, false, 10, Optional.of("Test")).get();
         
         Bundle sent = account.send(cda.getDepositAddress().getHashCheckSum(), 10, 
                 lorem, "IOTA9ACCOUNTS").get();

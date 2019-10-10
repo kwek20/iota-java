@@ -1,6 +1,7 @@
 package org.iota.jota.account;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 import org.iota.jota.account.condition.ExpireCondition;
@@ -63,13 +64,14 @@ public interface Account extends TaskService {
      * @param timeOut The date this address expires
      * @param multiUse If we expect multiple deposits
      * @param expectedAmount The final balance we expect to have in this address before we expire
+     * @param message The message you can add to the CDA, optional.
      * @param otherConditions Currently unused, used to specify custom conditions
      * @return {@link ConditionalDepositAddress} The newly generated CDA
      * @throws AccountError When we were not able to generate a new address
      * @throws AccountError When invalid conditions were given
      */
     @Document
-    Future<ConditionalDepositAddress> newDepositAddress(Date timeOut, boolean multiUse, long expectedAmount,
+    Future<ConditionalDepositAddress> newDepositAddress(Date timeOut, boolean multiUse, long expectedAmount, Optional<String> message, 
             ExpireCondition... otherConditions) throws AccountError;
     
     /**

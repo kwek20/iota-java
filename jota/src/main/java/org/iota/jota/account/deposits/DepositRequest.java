@@ -2,6 +2,8 @@ package org.iota.jota.account.deposits;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
 
 public class DepositRequest implements Serializable {
     
@@ -12,6 +14,8 @@ public class DepositRequest implements Serializable {
     boolean multiUse;
     
     long expectedAmount;
+    
+    String message;
 
     /**
      * Used in json de/construction
@@ -22,9 +26,18 @@ public class DepositRequest implements Serializable {
     }
     
     public DepositRequest(Date timeOut, boolean multiUse, long expectedAmount) {
+        this(timeOut, multiUse, expectedAmount, "");
+    }
+    
+    public DepositRequest(Date timeOut, boolean multiUse, long expectedAmount, Optional<String> message) {
+        this(timeOut, multiUse, expectedAmount, message.orElse(""));
+    }
+    
+    public DepositRequest(Date timeOut, boolean multiUse, long expectedAmount, String message) {
         this.timeOut = timeOut;
         this.multiUse = multiUse;
         this.expectedAmount = expectedAmount;
+        this.message = message;
     }
 
     /**
@@ -60,6 +73,14 @@ public class DepositRequest implements Serializable {
     public boolean isMultiUse() {
         return multiUse;
     }
+    
+    /**
+     * The message linked to this deposit request, can be empty but not <code>null</code>
+     * @return The message
+     */
+    public String getMessage() {
+        return message;
+    }
 
     /**
      * The expected amount which gets deposited.
@@ -81,37 +102,36 @@ public class DepositRequest implements Serializable {
     public boolean hasExpectedAmount() {
         return getExpectedAmount() != 0;
     }
-
-    @Override
-    public String toString() {
-        return "DepositRequest ["
-                + "timeOut=" + timeOut + ", "
-                + "multiUse=" + multiUse + ", "
-                + "expectedAmount=" + expectedAmount
-                + "]";
-    }
+    
+    
     
     @Override
+    public String toString() {
+        return "DepositRequest [timeOut=" + timeOut + ", multiUse=" + multiUse + ", expectedAmount=" + expectedAmount
+                + ", message=" + message + "]";
+    }
+
+    @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (expectedAmount ^ (expectedAmount >>> 32));
-        result = prime * result + (multiUse ? 1231 : 1237);
-        result = prime * result + ((timeOut == null) ? 0 : timeOut.hashCode());
-        return result;
+        return Objects.hash(expectedAmount, message, multiUse, timeOut);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!obj.getClass().equals(DepositRequest.class)) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        DepositRequest dr = (DepositRequest) obj;
-        return dr.multiUse == multiUse
-                && dr.timeOut.equals(timeOut)
-                && dr.expectedAmount == expectedAmount;
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        DepositRequest other = (DepositRequest) obj;
+        return expectedAmount == other.expectedAmount && Objects.equals(message, other.message)
+                && multiUse == other.multiUse && Objects.equals(timeOut, other.timeOut);
     }
-    
+
     @Override
     public DepositRequest clone() throws CloneNotSupportedException {
         return (DepositRequest) super.clone();
