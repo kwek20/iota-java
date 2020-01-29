@@ -1,44 +1,8 @@
 package org.iota.jota.connection;
 
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
 import org.iota.jota.config.types.IotaDefaultConfig;
-import org.iota.jota.dto.request.IotaAttachToTangleRequest;
-import org.iota.jota.dto.request.IotaBroadcastTransactionRequest;
-import org.iota.jota.dto.request.IotaCheckConsistencyRequest;
-import org.iota.jota.dto.request.IotaCommandRequest;
-import org.iota.jota.dto.request.IotaCustomRequest;
-import org.iota.jota.dto.request.IotaFindTransactionsRequest;
-import org.iota.jota.dto.request.IotaGetBalancesRequest;
-import org.iota.jota.dto.request.IotaGetInclusionStateRequest;
-import org.iota.jota.dto.request.IotaGetTransactionsToApproveRequest;
-import org.iota.jota.dto.request.IotaGetTrytesRequest;
-import org.iota.jota.dto.request.IotaNeighborsRequest;
-import org.iota.jota.dto.request.IotaStoreTransactionsRequest;
-import org.iota.jota.dto.request.IotaWereAddressesSpentFromRequest;
-import org.iota.jota.dto.response.AddNeighborsResponse;
-import org.iota.jota.dto.response.BroadcastTransactionsResponse;
-import org.iota.jota.dto.response.CheckConsistencyResponse;
-import org.iota.jota.dto.response.FindTransactionResponse;
-import org.iota.jota.dto.response.GetAttachToTangleResponse;
-import org.iota.jota.dto.response.GetBalancesResponse;
-import org.iota.jota.dto.response.GetInclusionStateResponse;
-import org.iota.jota.dto.response.GetNeighborsResponse;
-import org.iota.jota.dto.response.GetNodeAPIConfigurationResponse;
-import org.iota.jota.dto.response.GetNodeInfoResponse;
-import org.iota.jota.dto.response.GetTipsResponse;
-import org.iota.jota.dto.response.GetTransactionsToApproveResponse;
-import org.iota.jota.dto.response.GetTrytesResponse;
-import org.iota.jota.dto.response.InterruptAttachingToTangleResponse;
-import org.iota.jota.dto.response.IotaCustomResponse;
-import org.iota.jota.dto.response.RemoveNeighborsResponse;
-import org.iota.jota.dto.response.StoreTransactionsResponse;
-import org.iota.jota.dto.response.WereAddressesSpentFromResponse;
+import org.iota.jota.dto.request.*;
+import org.iota.jota.dto.response.*;
 import org.iota.jota.error.AccessLimitedException;
 import org.iota.jota.error.ArgumentException;
 import org.iota.jota.error.ConnectorException;
@@ -46,9 +10,15 @@ import org.iota.jota.error.InternalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.*;
+import okio.Buffer;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -136,6 +106,7 @@ public class HttpConnector implements Connection {
                         return chain.proceed(newRequest);
                     }
                 })
+                .addInterceptor(new LoggingInterceptor())
                 .build();
         this.url = url;
     }
@@ -379,5 +350,77 @@ public class HttpConnector implements Connection {
     public IotaCustomResponse customRequest(IotaCustomRequest customRequest) {
         final Call<IotaCustomResponse> res = service.customRequest(customRequest);
         return wrapCheckedException(res).body();
+    }
+
+    private class LoggingInterceptor implements Interceptor {
+
+        private static final String F_BREAK = " %n";
+        private static final String F_URL = " %s";
+        private static final String F_TIME = " in %.1fms";
+        private static final String F_HEADERS = "%s";
+        private static final String F_RESPONSE = F_BREAK + "Response: %d";
+        private static final String F_BODY = "body: %s";
+    
+        private static final String F_BREAKER = F_BREAK + "-------------------------------------------" + F_BREAK;
+        private static final String F_REQUEST_WITHOUT_BODY = F_URL + F_TIME + F_BREAK + F_HEADERS;
+        private static final String F_RESPONSE_WITHOUT_BODY = F_RESPONSE + F_BREAK + F_HEADERS + F_BREAKER;
+        private static final String F_REQUEST_WITH_BODY = F_URL + F_TIME + F_BREAK + F_HEADERS + F_BODY + F_BREAK;
+        private static final String F_RESPONSE_WITH_BODY = F_RESPONSE + F_BREAK + F_HEADERS + F_BODY + F_BREAK + F_BREAKER;
+    
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            Request request = chain.request();
+    
+            long t1 = System.nanoTime();
+            okhttp3.Response response = chain.proceed(request);
+            long t2 = System.nanoTime();
+    
+            MediaType contentType = null;
+            String bodyString = null;
+            if (response.body() != null) {
+                contentType = response.body().contentType();
+                bodyString = response.body().string();
+            }
+    
+            double time = (t2 - t1) / 1e6d;
+    
+            if (request.method().equals("GET")) {
+                System.out.println(String.format("GET " + F_REQUEST_WITHOUT_BODY + F_RESPONSE_WITH_BODY, request.url(), time, request.headers(), response.code(), response.headers(), stringifyResponseBody(bodyString)));
+            } else if (request.method().equals("POST")) {
+                System.out.println(String.format("POST " + F_REQUEST_WITH_BODY + F_RESPONSE_WITH_BODY, request.url(), time, request.headers(), stringifyRequestBody(request), response.code(), response.headers(), stringifyResponseBody(bodyString)));
+            } else if (request.method().equals("PUT")) {
+                System.out.println(String.format("PUT " + F_REQUEST_WITH_BODY + F_RESPONSE_WITH_BODY, request.url(), time, request.headers(), request.body().toString(), response.code(), response.headers(), stringifyResponseBody(bodyString)));
+            } else if (request.method().equals("DELETE")) {
+                System.out.println(String.format("DELETE " + F_REQUEST_WITHOUT_BODY + F_RESPONSE_WITHOUT_BODY, request.url(), time, request.headers(), response.code(), response.headers()));
+            }
+
+            if (response.body() != null) {
+                ResponseBody body = ResponseBody.create(contentType, bodyString);
+                return new okhttp3.Response.Builder()
+                        .body(body)
+                        .request(request)
+                        .code(response.code())
+                        .message(response.message())
+                        .protocol(response.protocol())
+                        .build();
+            } else {
+                return response;
+            }
+        }
+        
+        private String stringifyRequestBody(Request request) {
+            try {
+                final Request copy = request.newBuilder().build();
+                final Buffer buffer = new Buffer();
+                copy.body().writeTo(buffer);
+                return buffer.readUtf8();
+            } catch (final IOException e) {
+                return "did not work";
+            }
+        }
+    
+        public String stringifyResponseBody(String responseBody) {
+            return responseBody;
+        }
     }
 }
